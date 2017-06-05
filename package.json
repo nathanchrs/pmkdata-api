@@ -1,0 +1,35 @@
+{
+  "name": "pmkdata-api",
+  "version": "0.1.0",
+  "description": "API for PMK Data",
+  "main": "server.js",
+  "scripts": {
+    "lint": "semistandard",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nathanchrs/pmkdata-api.git"
+  },
+  "author": "PMK ITB",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nathanchrs/pmkdata-api/issues"
+  },
+  "homepage": "https://github.com/nathanchrs/pmkdata-api#readme",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.17.2",
+    "config": "^1.26.1",
+    "express": "^4.15.3",
+    "knex": "^0.13.0",
+    "lodash": "^4.17.4",
+    "method-override": "^2.3.9",
+    "passport": "^0.3.2",
+    "passport-local": "^1.0.0",
+    "winston": "^2.3.1"
+  },
+  "devDependencies": {
+    "semistandard": "^11.0.0"
+  }
+}
