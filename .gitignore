@@ -1,5 +1,5 @@
 # Sublime Text files
-.sublime-*
+*.sublime-*
 
 # Development configuration
 config/development.json
