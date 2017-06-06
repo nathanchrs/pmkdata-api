@@ -1,6 +1,9 @@
 # Sublime Text files
 *.sublime-*
 
+# IntelliJ files
+.idea
+
 # Development configuration
 config/development.json
 config/development-*.json
