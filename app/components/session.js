@@ -1,18 +1,14 @@
 'use strict';
 
 var session = require('express-session');
-var knex = require('./knex.js');
+var RedisStore = require('connect-redis')(session);
 var config = require('config');
-
-var KnexSessionStore = require('connect-session-knex')(session);
-var sessionStore = new KnexSessionStore({
-  knex: knex,
-  tablename: 'sessions'
-});
+var redisClient = require('./redis.js');
+var sessionStore = new RedisStore({ client: redisClient, prefix: 'pmkdata:session:' });
 
 module.exports = session({
   resave: false,
-  saveUninitialized: true,
+  saveUninitialized: false,
   secret: config.get('secret'),
   store: sessionStore
 });
