@@ -4,6 +4,7 @@ var passport = require('passport');
 var LocalStrategy = require('passport-local');
 var knex = require('./knex.js');
 var bcrypt = require('bcryptjs');
+var errors = require('http-errors');
 
 passport.use(new LocalStrategy(
   {
@@ -14,12 +15,12 @@ passport.use(new LocalStrategy(
     knex.first('username', 'nim', 'email', 'password').from('users').where('username', username)
       .then(function (user) {
         if (!user) {
-          return done(null, false, { message: 'Wrong username or password.' });
+          return done(new errors.Unauthorized('Wrong username or password.'));
         }
         bcrypt.compare(password, user.password, function (err, res) {
           user.password = undefined;
           if (err) return done(err);
-          if (!res) return done(null, false, { message: 'Wrong username or password.' });
+          if (!res) return done(new errors.Unauthorized('Wrong username or password.'));
           return done(null, user);
         });
       })

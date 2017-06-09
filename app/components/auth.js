@@ -8,7 +8,7 @@ var errors = require('http-errors');
 module.exports = {
 
   isLoggedIn: (req, res, next) => {
-    if (!req.user) return next(new errors.NotAuthorized());
+    if (!req.user) return next(new errors.Unauthorized('Not logged in.'));
     return next();
   },
 

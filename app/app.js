@@ -9,6 +9,7 @@ var listFiles = require('fs-readdir-recursive');
 var path = require('path');
 var config = require('config');
 var express = require('express');
+var errorHandler = require('api-error-handler');
 
 /* Create app and logger */
 
@@ -47,9 +48,9 @@ listFiles(routeDirectory).filter(file => file.endsWith('.routes.js')).forEach((f
   app.use(completeRoute, router);
 });
 
-/* Apply Express error and 404 handlers */
-// TODO:
-winston.log('warn', 'Still using default Express error handler, please implement custom error handlers');
+/* Apply Express error handler */
+
+app.use(errorHandler());
 
 /* Export the app */
 
