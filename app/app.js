@@ -5,7 +5,7 @@ console.log('NODE_ENV: %s\n', process.env.NODE_ENV);
 
 /* Load dependencies */
 
-var fs = require('fs');
+var listFiles = require('fs-readdir-recursive');
 var path = require('path');
 var config = require('config');
 var express = require('express');
@@ -36,17 +36,15 @@ app.use(passport.session());
 
 winston.log('verbose', 'Loading and applying routes...');
 
-var routeDirectory = path.join(__dirname, 'routes');
-fs.readdirSync(routeDirectory).forEach(function (file) {
+var routeDirectory = global.appDirectory;
+listFiles(routeDirectory).filter(file => file.endsWith('.routes.js')).forEach((file) => {
   var routerPath = path.join(routeDirectory, file);
+  var router = require(routerPath);
+  if (!router.baseRoute) router.baseRoute = '/';
+  var completeRoute = config.get('routePrefix') + router.baseRoute;
 
-  if (path.extname(routerPath) === '.js') {
-    var router = require(routerPath);
-    if (!router.baseRoute) router.baseRoute = '/';
-    var completeRoute = config.get('routePrefix') + router.baseRoute;
-    winston.log('verbose', 'Using route %s...', completeRoute);
-    app.use(completeRoute, router);
-  }
+  winston.log('verbose', 'Using route %s...', completeRoute);
+  app.use(completeRoute, router);
 });
 
 /* Apply Express error and 404 handlers */

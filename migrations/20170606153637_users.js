@@ -6,6 +6,7 @@ exports.up = (knex, Promise) => {
       table.integer('nim');
       table.string('email');
       table.string('password');
+      table.string('role');
       table.timestamps();
     })
   ]);
