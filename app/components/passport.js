@@ -17,6 +17,7 @@ passport.use(new LocalStrategy(
           return done(null, false, { message: 'Wrong username or password.' });
         }
         bcrypt.compare(password, user.password, function (err, res) {
+          user.password = undefined;
           if (err) return done(err);
           if (!res) return done(null, false, { message: 'Wrong username or password.' });
           return done(null, user);
