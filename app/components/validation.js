@@ -1,23 +1,27 @@
 'use strict';
 
-var Ajv = require('ajv');
-var errors = require('http-errors');
+/**
+ * @module app/components/validation
+ */
 
-var ajv = new Ajv({
+const Ajv = require('ajv');
+const errors = require('http-errors');
+
+const ajv = new Ajv({
   coerceTypes: true
 });
 
 module.exports = {
 
   /**
-   * Creates an Express middleware that validates req.body using the given JSON schema.
+   * Creates an [Express](https://expressjs.com/) middleware that validates req.body using the given JSON schema.
    * @param {object} schema - a JSON schema object that will be used for the validator.
    * @returns {function} -  an Express middleware function.
    */
   createValidator: (schema) => {
-    var validate = ajv.compile(schema);
+    const validate = ajv.compile(schema);
     return (req, res, next) => {
-      var valid = validate(req.body);
+      let valid = validate(req.body);
       if (!valid) {
         return next(new errors.UnprocessableEntity('Validation error.', validate.errors));
       }

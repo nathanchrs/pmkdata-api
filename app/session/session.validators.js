@@ -1,9 +1,9 @@
 'use strict';
 
-var _ = require('lodash');
-var validation = require('../components/validation.js');
+const _ = require('lodash');
+const validation = require('../components/validation.js');
 
-var schemas = {
+const schemas = {
 
   createSession: {
     'type': 'object',

@@ -1,7 +1,12 @@
 'use strict';
 
-var _ = require('lodash');
-var errors = require('http-errors');
+/**
+ * Contains custom [Express](https://expressjs.com/) middleware for authentication and authorization.
+ * @module app/components/auth
+ */
+
+const _ = require('lodash');
+const errors = require('http-errors');
 
 function createAuthMiddleware (roles) {
   if (typeof roles === 'string') roles = [roles];
@@ -16,11 +21,21 @@ function createAuthMiddleware (roles) {
 
 module.exports = {
 
+  /**
+   * Middleware that checks whether the user is logged in. Throws a HTTP Unauthorized (401) error otherwise.
+   */
   isLoggedIn: (req, res, next) => {
     if (!req.user) return next(new errors.Unauthorized('Not logged in.'));
     return next();
   },
 
+  /**
+   * Middleware that checks whether the user is an admin.
+   */
   isAdmin: createAuthMiddleware('admin'),
+
+  /**
+   * Middleware that checks whether the user is a supervisor.
+   */
   isSupervisor: createAuthMiddleware(['admin', 'supervisor'])
 };

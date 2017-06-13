@@ -1,7 +1,11 @@
 'use strict';
 
+/**
+ * @module app/components/winston
+ */
+
 var winston = require('winston');
-var config = require('config');
+const config = require('config');
 
 winston.addColors({
   error: 'red',
@@ -16,4 +20,5 @@ winston.addColors({
 winston.remove(winston.transports.Console);
 winston.add(winston.transports.Console, config.get('winston.console'));
 
+/** An instance of [Winston](https://github.com/winstonjs/winston) logger set up to use color in its console output. */
 module.exports = winston;

@@ -1,10 +1,14 @@
 'use strict';
 
-var passport = require('passport');
-var LocalStrategy = require('passport-local');
-var knex = require('./knex.js');
-var bcrypt = require('bcryptjs');
-var errors = require('http-errors');
+/**
+ * @module app/components/passport
+ */
+
+const passport = require('passport');
+const LocalStrategy = require('passport-local');
+const knex = require('./knex.js');
+const bcrypt = require('bcryptjs');
+const errors = require('http-errors');
 
 passport.use(new LocalStrategy(
   {
@@ -44,4 +48,5 @@ passport.deserializeUser((username, done) => {
     });
 });
 
+/** A [Passport](http://passportjs.org/) instance set up to use a local authentication strategy (with local username/password). */
 module.exports = passport;
