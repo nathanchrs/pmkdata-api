@@ -15,7 +15,7 @@ router.get('/session', auth.isLoggedIn, (req, res) => {
 
 /* Login */
 
-router.post('/session', passport.authenticate('local'), validators.createSession, (req, res) => {
+router.post('/session', validators.createSession, passport.authenticate('local'), (req, res) => {
   return res.json(req.user);
 });
 

@@ -3,7 +3,9 @@
 var Ajv = require('ajv');
 var errors = require('http-errors');
 
-var ajv = new Ajv();
+var ajv = new Ajv({
+  coerceTypes: true
+});
 
 module.exports = {
 
