@@ -5,7 +5,8 @@
   "main": "server.js",
   "scripts": {
     "lint": "semistandard",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "docs": "jsdoc app -r -R README.md -c jsdoc.conf -d docs"
   },
   "repository": {
     "type": "git",
@@ -38,6 +39,8 @@
     "winston": "^2.3.1"
   },
   "devDependencies": {
+    "jsdoc": "^3.4.3",
+    "jsdoc-route-plugin": "^0.1.0",
     "semistandard": "^11.0.0"
   }
 }

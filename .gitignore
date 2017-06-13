@@ -1,6 +1,9 @@
 # Sublime Text files
 *.sublime-*
 
+# jsDoc output
+docs
+
 # IntelliJ files
 .idea
 
