@@ -6,7 +6,7 @@
   "scripts": {
     "lint": "semistandard",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "docs": "jsdoc app -r -R README.md -c jsdoc.conf -d docs"
+    "docs": "rimraf docs && jsdoc -c jsdoc.conf"
   },
   "repository": {
     "type": "git",
@@ -41,6 +41,7 @@
   "devDependencies": {
     "jsdoc": "^3.4.3",
     "jsdoc-route-plugin": "^0.1.0",
+    "rimraf": "^2.6.1",
     "semistandard": "^11.0.0"
   }
 }
