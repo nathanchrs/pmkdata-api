@@ -6,7 +6,10 @@
   "scripts": {
     "lint": "semistandard",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "docs": "rimraf docs && jsdoc -c jsdoc.conf"
+    "docs": "rimraf docs && jsdoc -c jsdoc.conf",
+    "migrate": "knex migrate:latest",
+    "rollback": "knex migrate:rollback",
+    "seed": "knex seed:run"
   },
   "repository": {
     "type": "git",
@@ -41,6 +44,7 @@
   "devDependencies": {
     "jsdoc": "^3.4.3",
     "jsdoc-route-plugin": "^0.1.0",
+    "nodemon": "^1.11.0",
     "rimraf": "^2.6.1",
     "semistandard": "^11.0.0"
   }
