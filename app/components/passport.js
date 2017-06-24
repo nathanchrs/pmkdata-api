@@ -16,7 +16,7 @@ passport.use(new LocalStrategy(
     passwordField: 'password'
   },
   (username, password, done) => {
-    knex.first('username', 'nim', 'email', 'password').from('users').where('username', username)
+    knex.first('username', 'nim', 'email', 'password', 'role').from('users').where('username', username)
       .then(function (user) {
         if (!user) {
           return done(new errors.Unauthorized('Wrong username or password.'));
@@ -39,7 +39,7 @@ passport.serializeUser((user, done) => {
 });
 
 passport.deserializeUser((username, done) => {
-  knex.first('username', 'nim', 'email').from('users').where('username', username)
+  knex.first('username', 'nim', 'email', 'role').from('users').where('username', username)
     .then(function (user) {
       done(null, user);
     })
