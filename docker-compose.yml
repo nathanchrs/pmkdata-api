@@ -4,6 +4,7 @@ version: '2.1'
 services:
   app:
     build: .
+    command: 'node_modules/.bin/nodemon'
     depends_on:
       - mysql
       - redis
