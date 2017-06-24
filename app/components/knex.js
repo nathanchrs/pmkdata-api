@@ -13,6 +13,8 @@ const Knex = require('knex');
 const config = require('config');
 const _ = require('lodash');
 
+const knex = Knex(config.get('knex'));
+
 /**
  * Extends Knex with basic filtering support.
  * @param filterQuery {object} Query values (e.g. req.query in Express)
@@ -22,20 +24,21 @@ const _ = require('lodash');
  *        except 'contains', which is the same as the 'like' operator but with '%' wildcards before and after the filter value.
  */
 Object.getPrototypeOf(Knex.Client.prototype).filter = function (filterQuery, filters) {
-  let query = this;
-  for (let filterName in filters) {
-    let filterField = filters[filterName].field || filterName;
-    if (filterQuery[filterName] !== undefined) {
-      let filterOperator = filters[filterName].operator || 'contains';
-      let filterValue = filterQuery[filterName];
-      if (filterOperator === 'contains') {
-        filterOperator = 'like';
-        filterValue = '%' + filterValue + '%';
+  return this.where(function () {
+    let query = this;
+    for (let filterName in filters) {
+      let filterField = filters[filterName].field || filterName;
+      if (filterQuery[filterName] !== undefined) {
+        let filterOperator = filters[filterName].operator || 'contains';
+        let filterValue = filterQuery[filterName];
+        if (filterOperator === 'contains') {
+          filterOperator = 'like';
+          filterValue = '%' + filterValue + '%';
+        }
+        query = query.where(filterField, filterOperator, filterValue);
       }
-      query = query.where(filterField, filterOperator, filterValue);
     }
-  }
-  return query;
+  });
 };
 
 /**
@@ -44,19 +47,20 @@ Object.getPrototypeOf(Knex.Client.prototype).filter = function (filterQuery, fil
  * @param searchFields {array} Field names to search in
  */
 Object.getPrototypeOf(Knex.Client.prototype).search = function (search, searchFields) {
-  let query = this;
-  if (search) {
-    let first = true;
-    for (let searchFieldIndex in searchFields) {
-      if (first) {
-        query = query.where(searchFields[searchFieldIndex], 'like', '%' + search + '%');
-        first = false;
-      } else {
-        query = query.orWhere(searchFields[searchFieldIndex], 'like', '%' + search + '%');
+  return this.where(function () {
+    let query = this;
+    if (search) {
+      let first = true;
+      for (let searchFieldIndex in searchFields) {
+        if (first) {
+          query = query.where(searchFields[searchFieldIndex], 'like', '%' + search + '%');
+          first = false;
+        } else {
+          query = query.orWhere(searchFields[searchFieldIndex], 'like', '%' + search + '%');
+        }
       }
     }
-  }
-  return query;
+  });
 };
 
 /**
@@ -72,6 +76,7 @@ Object.getPrototypeOf(Knex.Client.prototype).search = function (search, searchFi
  */
 Object.getPrototypeOf(Knex.Client.prototype).pageAndSort = function (page, perPage, sort, sortableFields) {
   let query = this;
+  console.log(query.toString()); // DEBUG
   sort = (sort && typeof sort === 'string') ? sort.split(/\s*,\s*/) : []; // Split comma-delimited values
   let sortFields = [];
   if (!_.isArray) sortableFields = false;
@@ -96,7 +101,7 @@ Object.getPrototypeOf(Knex.Client.prototype).pageAndSort = function (page, perPa
 
   return Promise.all(
     [
-      query.clone().count('* as count').first(),
+      knex.from(query.as('query')).count('* as count').first(),
       query.offset(offset).limit(perPage)
     ]).then(function (values) {
       let totalCount = values[0].count;
@@ -113,4 +118,4 @@ Object.getPrototypeOf(Knex.Client.prototype).pageAndSort = function (page, perPa
 };
 
 /** An instance of [Knex](http://knexjs.org/), initialized using the options in the `knex` section of the app configuration. */
-module.exports = Knex(config.get('knex'));
+module.exports = knex;
