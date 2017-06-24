@@ -76,7 +76,6 @@ Object.getPrototypeOf(Knex.Client.prototype).search = function (search, searchFi
  */
 Object.getPrototypeOf(Knex.Client.prototype).pageAndSort = function (page, perPage, sort, sortableFields) {
   let query = this;
-  console.log(query.toString()); // DEBUG
   sort = (sort && typeof sort === 'string') ? sort.split(/\s*,\s*/) : []; // Split comma-delimited values
   let sortFields = [];
   if (!_.isArray) sortableFields = false;
