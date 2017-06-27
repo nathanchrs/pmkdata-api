@@ -101,4 +101,19 @@ router.patch('/users/:username', auth.isSupervisor, validators.updateUser, (req,
     });
 });
 
+/**
+ * Delete the specified user.
+ * @name Delete user
+ * @route {DELETE} /users/:username
+ */
+router.delete('/users/:username', auth.isSupervisor, (req, res, next) => {
+  return knex('users').delete().where('username', req.params.username)
+    .then((affectedRowCount) => {
+      return res.json({ affectedRowCount: affectedRowCount });
+    })
+    .catch((err) => {
+      return next(err);
+    });
+});
+
 module.exports = router;
