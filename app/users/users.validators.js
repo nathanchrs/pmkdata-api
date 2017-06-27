@@ -8,11 +8,7 @@ const schemas = {
 
   listUsers: {
     'type': 'object',
-    'properties': Object.assign(commonSchemas.pagingAndSortingProperties, {
-      'search': {
-        'type': 'string'
-      }
-    })
+    'properties': Object.assign({}, commonSchemas.pagingAndSortingProperties, commonSchemas.searchingProperties)
   },
 
   createUser: {
@@ -30,21 +26,19 @@ const schemas = {
     'type': 'object',
     'properties': {
       'nim': commonSchemas.nim,
-      'email': commonSchemas.email
-    },
-    'anyOf': [
-      {'required': ['nim']},
-      {'required': ['email']}
-    ]
-  },
-
-  updatePassword: {
-    'type': 'object',
-    'properties': {
+      'email': commonSchemas.email,
+      'status': commonSchemas.userStatus,
+      'role': commonSchemas.role,
       'oldPassword': commonSchemas.password,
       'newPassword': commonSchemas.password
     },
-    'required': ['oldPassword', 'newPassword']
+    'anyOf': [
+      {'required': ['nim']},
+      {'required': ['email']},
+      {'required': ['status']},
+      {'required': ['role']},
+      {'required': ['newPassword']}
+    ]
   }
 
 };

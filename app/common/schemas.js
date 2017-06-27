@@ -26,6 +26,16 @@ const schemas = {
     'maxLength': 255
   },
 
+  role: {
+    'type': 'string',
+    'enum': ['admin', 'supervisor', 'user']
+  },
+
+  userStatus: {
+    'type': 'string',
+    'enum': ['active', 'awaiting-validation', 'disabled']
+  },
+
   pagingAndSortingProperties: {
     'page': {
       'type': 'integer',
@@ -36,6 +46,12 @@ const schemas = {
       'minimum': 1
     },
     'sort': {
+      'type': 'string'
+    }
+  },
+
+  searchingProperties: {
+    'search': {
       'type': 'string'
     }
   }
