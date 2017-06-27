@@ -10,16 +10,25 @@ const bcrypt = require('bcryptjs');
 
 const router = express.Router();
 
+/** Custom auth middleware that checks whether the accessing user is this user's owner or a supervisor. */
+const isOwnerOrSupervisor = (req, res, next) => {
+  if (!req.user) return next(new errors.Unauthorized());
+  if (req.user.username !== req.params.username) {
+    if (!_.includes(['admin', 'supervisor'], req.user.role)) return next(new errors.Forbidden());
+  }
+  return next();
+};
+
 /**
  * Get a list of users.
  * @name Get users
  * @route {GET} /users
  */
 router.get('/users', auth.isSupervisor, validators.listUsers, (req, res, next) => {
-  return knex.select('username', 'nim', 'email', 'role', 'created_at', 'updated_at')
+  return knex.select('username', 'nim', 'email', 'role', 'status', 'created_at', 'updated_at')
     .from('users')
     .search(req.query.search, ['username', 'nim', 'email'])
-    .pageAndSort(req.query.page, req.query.perPage, req.query.sort, ['username', 'nim', 'email', 'role', 'created_at', 'updated_at'])
+    .pageAndSort(req.query.page, req.query.perPage, req.query.sort, ['username', 'nim', 'email', 'role', 'status', 'created_at', 'updated_at'])
     .then((result) => {
       return res.json(result);
     })
@@ -33,9 +42,10 @@ router.get('/users', auth.isSupervisor, validators.listUsers, (req, res, next) =
  * @name Create user
  * @route {POST} /users
  */
-router.post('/users', auth.isLoggedIn, validators.createUser, (req, res, next) => {
+router.post('/users', validators.createUser, (req, res, next) => { // TODO: email/captcha validation
   let newUser = _.pick(req.body, ['username', 'nim', 'email']);
   newUser.role = 'user';
+  newUser.status = 'awaiting_validation';
   newUser.created_at = newUser.updated_at = new Date();
 
   let query = knex.select('username').from('users').where('username', req.body.username);
@@ -65,8 +75,8 @@ router.post('/users', auth.isLoggedIn, validators.createUser, (req, res, next) =
  * @name Get user info.
  * @route {GET} /users/:username
  */
-router.get('/users/:username', auth.isLoggedIn, (req, res, next) => {
-  return knex.select('username', 'nim', 'email', 'role', 'created_at', 'updated_at')
+router.get('/users/:username', isOwnerOrSupervisor, (req, res, next) => {
+  return knex.select('username', 'nim', 'email', 'role', 'status', 'created_at', 'updated_at')
     .from('users')
     .where('username', req.params.username)
     .first()
@@ -85,7 +95,7 @@ router.get('/users/:username', auth.isLoggedIn, (req, res, next) => {
  * @name Update user
  * @route {PATCH} /users/:username
  */
-router.patch('/users/:username', auth.isSupervisor, validators.updateUser, (req, res, next) => { // TODO: owner auth
+router.patch('/users/:username', isOwnerOrSupervisor, validators.updateUser, (req, res, next) => {
   const userUpdate = {
     'nim': req.body.nim,
     'email': req.body.email,

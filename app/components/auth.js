@@ -11,7 +11,7 @@ const errors = require('http-errors');
 function createAuthMiddleware (roles) {
   if (typeof roles === 'string') roles = [roles];
   return function (req, res, next) {
-    if (!req.user) return next(new errors.NotAuthorized());
+    if (!req.user) return next(new errors.Unauthorized());
     if (!_.includes(roles, req.user.role)) return next(new errors.Forbidden());
     return next();
   };

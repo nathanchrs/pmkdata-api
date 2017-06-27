@@ -33,8 +33,8 @@ const schemas = {
       'email': commonSchemas.email
     },
     'anyOf': [
-      {'required': 'nim'},
-      {'required': 'email'}
+      {'required': ['nim']},
+      {'required': ['email']}
     ]
   },
 
