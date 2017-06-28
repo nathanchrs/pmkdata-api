@@ -26,7 +26,7 @@ passport.use(new LocalStrategy(
           user.password = undefined;
           if (err) return done(err);
           if (!res) return done(new errors.Unauthorized('Wrong username or password.'));
-          if (auth.predicates.isActive(user)) return done(new errors.Unauthorized('Account inactive.'));
+          if (!auth.predicates.isActive(user)) return done(new errors.Unauthorized('Account inactive.'));
           return done(null, user);
         });
       })
