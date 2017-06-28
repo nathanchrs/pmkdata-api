@@ -16,7 +16,7 @@ const router = express.Router();
  * @name Get current session
  * @route {GET} /session
  */
-router.get('/session', auth.isLoggedIn, (req, res) => {
+router.get('/session', auth.middleware.isLoggedIn, (req, res) => {
   return res.json(req.user);
 });
 

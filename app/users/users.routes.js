@@ -10,21 +10,16 @@ const queries = require('./users.queries.js');
 const router = express.Router();
 
 /** Custom auth middleware that checks whether the accessing user is this user's owner or a supervisor. */
-// TODO: refactor duplicate auth definitions
-const isOwnerOrSupervisor = (req, res, next) => {
-  if (!req.user) return next(new errors.Unauthorized());
-  if (req.user.username !== req.params.username) {
-    if (!_.includes(['admin', 'supervisor'], req.user.role)) return next(new errors.Forbidden());
-  }
-  return next();
-};
+const isOwnerOrSupervisor = auth.createMiddlewareFromPredicate((user, req) => {
+  return (user.username === req.params.username) || auth.predicates.isSupervisor(user);
+});
 
 /**
  * Get a list of users.
  * @name Get users
  * @route {GET} /users
  */
-router.get('/users', auth.isSupervisor, validators.listUsers, (req, res, next) => {
+router.get('/users', auth.middleware.isSupervisor, validators.listUsers, (req, res, next) => {
   return queries.listUsers(req.query.search, req.query.page, req.query.perPage, req.query.sort)
     .then((result) => {
       return res.json(result);
@@ -77,9 +72,8 @@ router.patch('/users/:username', isOwnerOrSupervisor, validators.updateUser, (re
   };
 
   // Supervisor can update all and don't need old password check for password changes, owner can't update status, role, NIM
-  // TODO: refactor duplicate auth definitions
   let requireOldPasswordCheck = true;
-  if (_.includes(['admin', 'supervisor'], req.user.role)) {
+  if (auth.predicates.isSupervisor(req.user)) {
     userUpdates.nim = req.body.nim;
     userUpdates.status = req.body.status;
     userUpdates.role = req.body.role;
@@ -98,7 +92,7 @@ router.patch('/users/:username', isOwnerOrSupervisor, validators.updateUser, (re
  * @name Delete user
  * @route {DELETE} /users/:username
  */
-router.delete('/users/:username', auth.isSupervisor, (req, res, next) => {
+router.delete('/users/:username', auth.middleware.isSupervisor, (req, res, next) => {
   return queries.deleteUser(req.params.username)
     .then((affectedRowCount) => {
       return res.json({ affectedRowCount: affectedRowCount });
