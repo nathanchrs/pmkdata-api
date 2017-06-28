@@ -4,7 +4,7 @@ exports.seed = (knex, Promise) => {
     .then(() => {
       return Promise.all([
         // Inserts seed entries
-        knex('users').insert({ username: 'admin', nim: '12315123', email: 'admin@pmk.itb.ac.id', password: '$2a$08$Wn3jW9b0VvPkshi272ctweyyn0O7.bFXx4xFCoNHpBdiCDashRI/q', role: 'admin', status: 'active' }) // Password: admin
+        knex('users').insert({ username: 'admin', nim: '12315123', email: 'admin@pmk.itb.ac.id', password: '$2a$08$QwNk.YBBpry2N09/LVudj.ZvVtkL.6JIYvGd8Y8MT9VQ3mMfHwF8S', role: 'admin', status: 'active' }) // Password: admin
       ]);
     });
 };
