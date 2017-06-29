@@ -33,7 +33,7 @@ router.get('/users', auth.middleware.isSupervisor, validators.listUsers, (req, r
  * @route {POST} /users
  */
 router.post('/users', validators.createUser, (req, res, next) => { // TODO: email/captcha validation
-  let newUser = _.pick(req.body, ['username', 'nim', 'email']);
+  let newUser = _.pick(req.body, ['username', 'nim', 'email', 'password']);
   newUser.role = 'user';
   newUser.status = 'awaiting_validation';
   newUser.created_at = newUser.updated_at = new Date();
