@@ -100,7 +100,7 @@ Object.getPrototypeOf(Knex.Client.prototype).pageAndSort = function (page, perPa
 
   return Promise.all(
     [
-      knex.from(query.as('query')).count('* as count').first(),
+      knex.from(query.as('query')).count('* as count').first(), // WARNING: need to find some way to get a Knex instance from the current query instead.
       query.offset(offset).limit(perPage)
     ]).then(function (values) {
       let totalCount = values[0].count;

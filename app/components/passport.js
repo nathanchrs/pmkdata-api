@@ -9,6 +9,7 @@ const LocalStrategy = require('passport-local');
 const knex = require('./knex.js');
 const bcrypt = require('bcryptjs');
 const errors = require('http-errors');
+const auth = require('./auth.js');
 
 passport.use(new LocalStrategy(
   {
@@ -16,7 +17,7 @@ passport.use(new LocalStrategy(
     passwordField: 'password'
   },
   (username, password, done) => {
-    knex.first('username', 'nim', 'email', 'password', 'role').from('users').where('username', username)
+    knex.first('username', 'nim', 'email', 'password', 'role', 'status').from('users').where('username', username)
       .then(function (user) {
         if (!user) {
           return done(new errors.Unauthorized('Wrong username or password.'));
@@ -25,12 +26,11 @@ passport.use(new LocalStrategy(
           user.password = undefined;
           if (err) return done(err);
           if (!res) return done(new errors.Unauthorized('Wrong username or password.'));
+          if (!auth.predicates.isActive(user)) return done(new errors.Unauthorized('Account inactive.'));
           return done(null, user);
         });
       })
-      .catch(function (err) {
-        return done(err);
-      });
+      .catch(done);
   })
 );
 
@@ -39,13 +39,11 @@ passport.serializeUser((user, done) => {
 });
 
 passport.deserializeUser((username, done) => {
-  knex.first('username', 'nim', 'email', 'role').from('users').where('username', username)
+  knex.first('username', 'nim', 'email', 'role', 'status').from('users').where('username', username)
     .then(function (user) {
       done(null, user);
     })
-    .catch(function (err) {
-      done(err);
-    });
+    .catch(done);
 });
 
 /** A [Passport](http://passportjs.org/) instance set up to use a local authentication strategy (with local username/password). */

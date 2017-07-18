@@ -18,11 +18,15 @@ Note: Docker commands might need root privileges/sudo.
 6. Run `docker exec <app_container_name> npm run seed` to populate the DB with sample data. The app can now be accessed at port 3000.
 
 - To stop the containers, run `docker-compose stop`.
-- To start the application again, simply run `docker-compose up` or `docker-compose start` to run in the background.
-- Use `docker exec -ti <container_name> /bin/bash` to get a shell on a running container.
+- To start the application again, simply run `docker-compose up` or `docker-compose up -d` to run in the background (if you don't need to recreate containers, you can also use `docker-compose start`).
+- Use `docker exec -ti <container_name> /bin/sh` to get a shell on a running container.
 - To remove the containers, run `docker-compose down`.
 - If the Dockerfile is modified, you will need to rebuild the Docker images by removing the containers and running `docker-compose build` again.
-- If a DB migration or seed is modified, you will need to rerun step 5 or 6 again.
+- If a DB migration or seed is modified, you will need to rollback migrations, reapply it, then reseed the DB (Warning: existing data on the DB will be destroyed):
+	1. Run `docker exec -ti <container_name> /bin/sh` to get a shell on the running app container.
+	2. In the app container, run `npm run rollback` until there are no more migrations to rollback to (empty DB).
+	3. In the app container, run `npm run migrate`.
+	4. (Optional) To seed the DB, run `npm run seed` in the app container.
 
 # Development guidelines
 

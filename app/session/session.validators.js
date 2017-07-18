@@ -2,18 +2,15 @@
 
 const _ = require('lodash');
 const validation = require('../components/validation.js');
+const commonSchemas = require('../common/schemas.js');
 
 const schemas = {
 
   createSession: {
     'type': 'object',
     'properties': {
-      'username': {
-        'type': 'string'
-      },
-      'password': {
-        'type': 'string'
-      }
+      'username': commonSchemas.username,
+      'password': commonSchemas.password
     },
     'required': ['username', 'password']
   }
