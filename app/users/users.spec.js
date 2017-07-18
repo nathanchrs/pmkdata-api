@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-expressions */
 'use strict';
 
 const chai = require('chai');
@@ -12,7 +11,7 @@ const knex = require('../components/knex');
 const winston = require('../components/winston');
 
 describe('User handling', function () {
-  afterEach((done) => {
+  beforeEach((done) => {
     knex.migrate.rollback()
             .then(() => {
               knex.migrate.latest()
@@ -67,7 +66,6 @@ describe('User handling', function () {
           expect(resfromdel.body.message).to.equal('Unauthorized');
           expect(resfromdel.body.name).to.equal('UnauthorizedError');
           done();
-          11;
         });
       });
     });

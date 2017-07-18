@@ -18,7 +18,7 @@ describe('Knex extensions', function () {
         column2: {},
         column3: {}
       };
-      const sql = knex.select('column1', 'column2').from('table').filter(filterQuery, filters).toString();
+      const sql = knex.select('column1', 'column2').from('table').filter(filterQuery, filters).toString().replace(/"/g, '`');
       expect(sql).to.be.equal('select `column1`, `column2` from `table` where (`column1` like \'%filter query 1%\')');
     });
 
@@ -29,7 +29,7 @@ describe('Knex extensions', function () {
         column2: {},
         column3: {}
       };
-      const sql = knex.select('column1', 'column2').from('table').filter(filterQuery, filters).toString();
+      const sql = knex.select('column1', 'column2').from('table').filter(filterQuery, filters).toString().replace(/"/g, '`');
       expect(sql).to.be.equal('select `column1`, `column2` from `table`');
     });
 
@@ -39,7 +39,7 @@ describe('Knex extensions', function () {
         column3: 'filter query 2'
       };
       const filters = {};
-      const sql = knex.select('column1', 'column2').from('table').filter(filterQuery, filters).toString();
+      const sql = knex.select('column1', 'column2').from('table').filter(filterQuery, filters).toString().replace(/"/g, '`');
       expect(sql).to.be.equal('select `column1`, `column2` from `table`');
     });
 
@@ -53,7 +53,7 @@ describe('Knex extensions', function () {
         column2: {},
         column3: {}
       };
-      const sql = knex.select('column1', 'column2').from('table').filter(filterQuery, filters).toString();
+      const sql = knex.select('column1', 'column2').from('table').filter(filterQuery, filters).toString().replace(/"/g, '`');
       expect(sql).to.be.equal('select `column1`, `column2` from `table` where (`column1` like \'%filter query 1%\' and `column3` like \'%filter query 2%\')');
     });
 
@@ -69,7 +69,7 @@ describe('Knex extensions', function () {
         column2: { operator: '>=' },
         column3: { operator: 'contains' }
       };
-      const sql = knex.select('column1', 'column2').from('table').filter(filterQuery, filters).toString();
+      const sql = knex.select('column1', 'column2').from('table').filter(filterQuery, filters).toString().replace(/"/g, '`');
       expect(sql).to.be.equal('select `column1`, `column2` from `table` where (`column1` = \'filter query 1\' and `column2` >= \'filter query 2\' and `column3` like \'%filter query 3%\')');
     });
 
@@ -87,24 +87,24 @@ describe('Knex extensions', function () {
         equalsColumn2: { field: 'column2', operator: '=' },
         containsColumn3: { field: 'column3', operator: 'contains' }
       };
-      const sql = knex.select('column1', 'column2').from('table').filter(filterQuery, filters).toString();
+      const sql = knex.select('column1', 'column2').from('table').filter(filterQuery, filters).toString().replace(/"/g, '`');
       expect(sql).to.be.equal('select `column1`, `column2` from `table` where (`column1` <> \'filter query 1\' and `column2` = \'filter query 2\' and `column3` like \'%filter query 3%\')');
     });
   });
 
   describe('Search', function () {
     it('should produce correct SQL for single search column', function () {
-      const sql = knex.select('column1', 'column2').from('table').search('search query', ['column1']).toString();
+      const sql = knex.select('column1', 'column2').from('table').search('search query', ['column1']).toString().replace(/"/g, '`');
       expect(sql).to.be.equal('select `column1`, `column2` from `table` where (`column1` like \'%search query%\')');
     });
 
     it('should produce correct SQL for multiple search columns', function () {
-      const sql = knex.select('column1', 'column2').from('table').search('search query', ['column3', 'column4']).toString();
+      const sql = knex.select('column1', 'column2').from('table').search('search query', ['column3', 'column4']).toString().replace(/"/g, '`');
       expect(sql).to.be.equal('select `column1`, `column2` from `table` where (`column3` like \'%search query%\' or `column4` like \'%search query%\')');
     });
 
     it('should produce correct SQL if no search column is specified', function () {
-      const sql = knex.select('column1', 'column2').from('table').search('search query', []).toString();
+      const sql = knex.select('column1', 'column2').from('table').search('search query', []).toString().replace(/"/g, '`');
       expect(sql).to.be.equal('select `column1`, `column2` from `table`');
     });
   });
