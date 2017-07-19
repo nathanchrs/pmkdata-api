@@ -32,8 +32,8 @@ module.exports = {
 
     return query.first()
             .then((existingUsers) => {
-              if (existingUsers && existingUsers.length > 0) {
-                if (existingUsers[0].username === newUser.username) {
+              if (existingUsers) {
+                if (existingUsers.username === newUser.username) {
                   throw new errors.Conflict('Username already exists.');
                 } else {
                   throw new errors.Conflict('There is already a user for this NIM.');
