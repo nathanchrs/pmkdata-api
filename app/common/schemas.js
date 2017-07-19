@@ -1,6 +1,33 @@
 'use strict';
 
 const schemas = {
+  number: (min, max) => {
+    let schema = {
+      'type': 'integer'
+    };
+
+    if (min) {
+      schema['minimum'] = min;
+    }
+
+    if (max) {
+      schema['maximum'] = max;
+    }
+
+    return schema;
+  },
+
+  date: {
+    'type': 'string',
+    'format': 'date'
+  },
+
+  varchar: (length) => {
+    return {
+      'type': 'string',
+      'maxLength': length
+    };
+  },
 
   nim: {
     'type': 'integer',
