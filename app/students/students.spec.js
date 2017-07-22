@@ -24,6 +24,19 @@ describe('student handling', function () {
             });
   });
 
+  after((done) => {
+    knex.migrate.rollback()
+            .then(() => {
+              knex.migrate.latest()
+                    .then(() => {
+                      knex.seed.run()
+                            .then(() => {
+                              done();
+                            });
+                    });
+            });
+  });
+
   describe('new student', function () {
     let createNewStudent = {
       'year': 2015,
