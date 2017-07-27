@@ -24,6 +24,19 @@ describe('User handling', function () {
             });
   });
 
+  after((done) => {
+    knex.migrate.rollback()
+            .then(() => {
+              knex.migrate.latest()
+                    .then(() => {
+                      knex.seed.run()
+                            .then(() => {
+                              done();
+                            });
+                    });
+            });
+  });
+
   describe('new user', function () {
     let createNewUser = {
       'nim': 13515073,
