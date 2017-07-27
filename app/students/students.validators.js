@@ -16,13 +16,13 @@ const schemas = {
     'properties': {
       'tpb_nim': commonSchemas.nim,
       'nim': commonSchemas.nim,
-      'year': commonSchemas.number(2000, 2100),
+      'year': commonSchemas.year,
       'department': commonSchemas.varchar(255),
       'name': commonSchemas.varchar(255),
-      'gender': commonSchemas.varchar(16),
+      'gender': commonSchemas.gender,
       'birth_date': commonSchemas.date,
-      'phone': commonSchemas.varchar(16),
-      'line': commonSchemas.varchar(32),
+      'phone': commonSchemas.phone,
+      'line': commonSchemas.line,
       'high_school': commonSchemas.varchar(255),
       'church': commonSchemas.varchar(255)
     },
@@ -34,28 +34,28 @@ const schemas = {
     'properties': {
       'tpb_nim': commonSchemas.nim,
       'nim': commonSchemas.nim,
-      'year': commonSchemas.number(2000, 2100),
+      'year': commonSchemas.year,
       'department': commonSchemas.varchar(255),
       'name': commonSchemas.varchar(255),
-      'gender': commonSchemas.varchar(16),
+      'gender': commonSchemas.gender,
       'birth_date': commonSchemas.date,
-      'phone': commonSchemas.varchar(16),
-      'line': commonSchemas.varchar(32),
+      'phone': commonSchemas.phone,
+      'line': commonSchemas.line,
       'high_school': commonSchemas.varchar(255),
       'church': commonSchemas.varchar(255)
     },
     'anyOf': [
-            { 'required': ['tpb_nim'] },
-            { 'required': ['nim'] },
-            { 'required': ['year'] },
-            { 'required': ['department'] },
-            { 'required': ['name'] },
-            { 'required': ['gender'] },
-            { 'required': ['birth_date'] },
-            { 'required': ['phone'] },
-            { 'required': ['line'] },
-            { 'required': ['high_school'] },
-            { 'required': ['church'] }
+      { 'required': ['tpb_nim'] },
+      { 'required': ['nim'] },
+      { 'required': ['year'] },
+      { 'required': ['department'] },
+      { 'required': ['name'] },
+      { 'required': ['gender'] },
+      { 'required': ['birth_date'] },
+      { 'required': ['phone'] },
+      { 'required': ['line'] },
+      { 'required': ['high_school'] },
+      { 'required': ['church'] }
     ]
   }
 

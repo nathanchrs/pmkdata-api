@@ -5,21 +5,9 @@ const schemas = {
     let schema = {
       'type': 'integer'
     };
-
-    if (min) {
-      schema['minimum'] = min;
-    }
-
-    if (max) {
-      schema['maximum'] = max;
-    }
-
+    if (min) schema.minimum = min;
+    if (max) schema.maximum = max;
     return schema;
-  },
-
-  date: {
-    'type': 'string',
-    'format': 'date'
   },
 
   varchar: (length) => {
@@ -27,6 +15,33 @@ const schemas = {
       'type': 'string',
       'maxLength': length
     };
+  },
+
+  date: {
+    'type': 'string',
+    'format': 'date'
+  },
+
+  year: {
+    'type': 'integer',
+    'minimum': 1990,
+    'maximum': 2089
+  },
+
+  gender: {
+    'type': 'string',
+    'enum': ['male', 'female']
+  },
+
+  phone: {
+    'type': 'string',
+    'maxLength': 16
+  },
+
+  line: {
+    'type': 'string',
+    'maxLength': 32,
+    'pattern': '^[a-zA-Z0-9@_]+$'
   },
 
   nim: {
