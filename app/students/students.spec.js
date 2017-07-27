@@ -39,7 +39,7 @@ describe('student handling', function () {
     };
 
     it('should return 201 after creating new student', (done) => {
-      chai.request(routes).post('/students').send(createNewStudent).end((err, res) => {
+      chai.request(routes).post('/api/students').send(createNewStudent).end((err, res) => {
         expect(err).to.be.falsy;
         expect(res).to.have.status(201);
         expect(res).to.be.a('object');
@@ -52,9 +52,9 @@ describe('student handling', function () {
     });
 
     it('should not get specific student if not logged in', (done) => {
-      chai.request(routes).post('/students').send(createNewStudent).end((err, res) => {
+      chai.request(routes).post('/api/students').send(createNewStudent).end((err, res) => {
         expect(err).to.be.falsy;
-        chai.request(routes).get('/students/' + res.body.id).end((err, resfromget) => {
+        chai.request(routes).get('/api/students/' + res.body.id).end((err, resfromget) => {
           expect(err).to.be.falsy;
           expect(resfromget).to.have.status(401);
           expect(resfromget.body.message).to.equal('Unauthorized');
@@ -65,9 +65,9 @@ describe('student handling', function () {
     });
 
     it('should not get list of students if not logged in', (done) => {
-      chai.request(routes).post('/students').send(createNewStudent).end((err, res) => {
+      chai.request(routes).post('/api/students').send(createNewStudent).end((err, res) => {
         expect(err).to.be.falsy;
-        chai.request(routes).get('/students').end((err, resfromget) => {
+        chai.request(routes).get('/api/students').end((err, resfromget) => {
           expect(err).to.be.falsy;
           expect(resfromget).to.have.status(401);
           expect(resfromget.body.message).to.equal('Unauthorized');
@@ -78,9 +78,9 @@ describe('student handling', function () {
     });
 
     it('should not delete student if not logged in', (done) => {
-      chai.request(routes).post('/students').send(createNewStudent).end((err, res) => {
+      chai.request(routes).post('/api/students').send(createNewStudent).end((err, res) => {
         expect(err).to.be.falsy;
-        chai.request(routes).delete('/students/' + res.body.id).end((err, resfromdel) => {
+        chai.request(routes).delete('/api/students/' + res.body.id).end((err, resfromdel) => {
           expect(err).to.be.falsy;
           expect(resfromdel).to.have.status(401);
           expect(resfromdel.body.message).to.equal('Unauthorized');
@@ -91,9 +91,9 @@ describe('student handling', function () {
     });
 
     it('should not edit student if not logged in', (done) => {
-      chai.request(routes).post('/students').send(createNewStudent).end((err, res) => {
+      chai.request(routes).post('/api/students').send(createNewStudent).end((err, res) => {
         expect(err).to.be.falsy;
-        chai.request(routes).patch('/students/' + res.body.id).send({ nim: 13515074 }).end((err, resfrompatch) => {
+        chai.request(routes).patch('/api/students/' + res.body.id).send({ nim: 13515074 }).end((err, resfrompatch) => {
           expect(err).to.be.falsy;
           expect(resfrompatch).to.have.status(401);
           expect(resfrompatch.body.message).to.equal('Unauthorized');
