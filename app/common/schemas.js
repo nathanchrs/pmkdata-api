@@ -33,7 +33,7 @@ const schemas = {
 
   userStatus: {
     'type': 'string',
-    'enum': ['active', 'awaiting-validation', 'disabled']
+    'enum': ['active', 'awaiting_validation', 'disabled']
   },
 
   pagingAndSortingProperties: {
