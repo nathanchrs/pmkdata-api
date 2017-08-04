@@ -5,11 +5,11 @@ exports.seed = function (knex, Promise) {
           // Inserts seed entries
           let interactionParticipants = [
             {
-              mentor_id: 1,
+              interaction_id: 1,
               mentee_id: 1
             },
             {
-              mentor_id: 1,
+              interaction_id: 1,
               mentee_id: 2
             }
           ];

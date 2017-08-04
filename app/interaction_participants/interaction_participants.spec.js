@@ -27,7 +27,7 @@ describe('interaction_participants handling', function () {
 
   describe('new interaction_participant', function () {
     let createNewInteractionParticipant = {
-      'mentor_id': 1,
+      'interaction_id': 1,
       'mentee_id': 3
     };
 
@@ -39,7 +39,7 @@ describe('interaction_participants handling', function () {
         expect(res.body).to.be.a('object');
         expect(res.body).to.haveOwnProperty('created_at');
         expect(res.body).to.haveOwnProperty('updated_at');
-        expect(res.body.mentor_id).to.equal(1);
+        expect(res.body.interaction_id).to.equal(1);
         done();
       });
     });
@@ -86,7 +86,7 @@ describe('interaction_participants handling', function () {
     it('should not edit interaction_participant if not logged in', (done) => {
       chai.request(routes).post('/api/interaction_participants').send(createNewInteractionParticipant).end((err, res) => {
         expect(err).to.be.falsy;
-        chai.request(routes).patch('/api/interaction_participants/' + res.body.id).send({ mentor_id: 2 }).end((err, resfrompatch) => {
+        chai.request(routes).patch('/api/interaction_participants/' + res.body.id).send({ interaction_id: 2 }).end((err, resfrompatch) => {
           expect(err).to.be.falsy;
           expect(resfrompatch).to.have.status(401);
           expect(resfrompatch.body.message).to.equal('Unauthorized');

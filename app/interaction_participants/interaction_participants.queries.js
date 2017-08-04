@@ -4,10 +4,10 @@ var knex = require('../components/knex.js');
 
 module.exports = {
   listInteractionParticipants: (search, page, perPage, sort) => {
-    return knex.select('id', 'mentor_id', 'mentee_id', 'notes', 'created_at', 'updated_at')
+    return knex.select('id', 'interaction_id', 'mentee_id', 'notes', 'created_at', 'updated_at')
       .from('interaction_participants')
-      .search(search, ['id', 'mentor_id', 'mentee_id', 'notes'])
-      .pageAndSort(page, perPage, sort, ['id', 'mentor_id', 'mentee_id', 'notes']);
+      .search(search, ['id', 'interaction_id', 'mentee_id', 'notes'])
+      .pageAndSort(page, perPage, sort, ['id', 'interaction_id', 'mentee_id', 'notes']);
   },
 
   createInteractionParticipant: (newInteractionParticipant) => {
@@ -15,7 +15,7 @@ module.exports = {
   },
 
   getInteractionParticipant: (id) => {
-    return knex.select('id', 'mentor_id', 'mentee_id', 'notes', 'created_at', 'updated_at')
+    return knex.select('id', 'interaction_id', 'mentee_id', 'notes', 'created_at', 'updated_at')
       .from('interaction_participants')
       .where('id', id)
       .first();

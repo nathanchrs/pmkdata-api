@@ -14,20 +14,20 @@ const schemas = {
   createInteractionParticipant: {
     'type': 'object',
     'properties': {
-      'mentor_id': commonSchemas.number(),
+      'interaction_id': commonSchemas.number(),
       'mentee_id': commonSchemas.number()
     },
-    'required': ['mentor_id', 'mentee_id']
+    'required': ['interaction_id', 'mentee_id']
   },
 
   updateInteractionParticipant: {
     'type': 'object',
     'properties': {
-      'mentor_id': commonSchemas.number(),
+      'interaction_id': commonSchemas.number(),
       'mentee_id': commonSchemas.number()
     },
     'anyOf': [
-      { 'required': ['mentor_id'] },
+      { 'required': ['interaction_id'] },
       { 'required': ['mentee_id'] }
     ]
   }

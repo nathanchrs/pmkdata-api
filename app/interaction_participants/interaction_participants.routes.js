@@ -28,7 +28,7 @@ router.get('/interaction_participants', auth.middleware.isSupervisor, validators
  * @route {POST} /interaction_participants
  */
 router.post('/interaction_participants', validators.createInteractionParticipant, (req, res, next) => {
-  let newInteractionParticipant = _.pick(req.body, ['mentor_id', 'mentee_id', 'notes']);
+  let newInteractionParticipant = _.pick(req.body, ['interaction_id', 'mentee_id', 'notes']);
   newInteractionParticipant.created_at = newInteractionParticipant.updated_at = new Date();
 
   return queries.createInteractionParticipant(newInteractionParticipant)
@@ -60,7 +60,7 @@ router.get('/interaction_participants/:id', auth.middleware.isSupervisor, (req, 
  * @route {PATCH} /interaction_participants/:id
  */
 router.patch('/interaction_participants/:id', auth.middleware.isSupervisor, validators.updateInteractionParticipant, (req, res, next) => {
-  let interactionParticipantUpdates = _.pick(req.body, ['mentor_id', 'mentee_id', 'notes']);
+  let interactionParticipantUpdates = _.pick(req.body, ['interaction_id', 'mentee_id', 'notes']);
   interactionParticipantUpdates.updated_at = new Date();
 
   return queries.updateInteractionParticipant(req.params.id, interactionParticipantUpdates)
