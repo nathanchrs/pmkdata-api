@@ -17,6 +17,11 @@ const schemas = {
     };
   },
 
+  datetime: {
+    'type': 'string',
+    'format': 'date-time'
+  },
+
   date: {
     'type': 'string',
     'format': 'date'

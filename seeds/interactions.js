@@ -1,0 +1,20 @@
+exports.seed = function (knex, Promise) {
+    // Deletes ALL existing entries
+  return knex('interactions').del()
+        .then(() => {
+          // Inserts seed entries
+          let interactions = [
+            {
+              time: '2017-08-12 08:00:00', // YYYY-MM-DD HH:MM:SS
+              notes: 'Laporan mahasiswa baru ITB'
+            },
+            {
+              time: '2017-08-12 09:00:00', // YYYY-MM-DD HH:MM:SS
+              notes: 'Eval PMB 2017'
+            }
+          ];
+          return Promise.all([
+            knex('interactions').insert(interactions)
+          ]);
+        });
+};

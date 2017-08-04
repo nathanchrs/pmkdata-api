@@ -13,7 +13,8 @@
       "disposeTimeout": 360000000,
       "idleTimeoutMillis": 360000000
     },
-    "debug": false
+    "debug": false,
+    "useNullAsDefault": true
   },
 
   "redis": {
