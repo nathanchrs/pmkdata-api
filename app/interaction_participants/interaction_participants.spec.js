@@ -28,7 +28,7 @@ describe('interaction_participants handling', function () {
   describe('new interaction_participant', function () {
     let createNewInteractionParticipant = {
       'mentor_id': 1,
-      'mentee_id': 3,
+      'mentee_id': 3
     };
 
     it('should return 201 after creating new interaction_participant', (done) => {

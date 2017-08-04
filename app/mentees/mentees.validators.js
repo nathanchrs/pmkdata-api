@@ -31,7 +31,7 @@ const schemas = {
     'anyOf': [
       { 'required': ['mentor_id'] },
       { 'required': ['mentee_id'] },
-      { 'required': ['notes']}
+      { 'required': ['notes'] }
     ]
   }
 };
