@@ -11,10 +11,12 @@ const schemas = {
   },
 
   varchar: (length) => {
-    return {
-      'type': 'string',
-      'maxLength': length
-    };
+    let schema = {
+      'type': 'string'
+    }
+
+    if(length) schema.maxLength = length;
+    return schema;
   },
 
   department: {

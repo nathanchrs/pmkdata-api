@@ -26,7 +26,7 @@ const schemas = {
     'properties': {
       'mentor_id': commonSchemas.number(),
       'mentee_id': commonSchemas.number(),
-      'notes': commonSchemas.varchar(65535)
+      'notes': commonSchemas.varchar()
     },
     'anyOf': [
       { 'required': ['mentor_id'] },
