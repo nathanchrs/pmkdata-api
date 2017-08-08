@@ -26,10 +26,7 @@ const schemas = {
       'name': commonSchemas.varchar(255),
       'description': commonSchemas.varchar(65535)
     },
-    'anyOf': [
-      { 'required': ['name'] },
-      { 'required': ['description'] }
-    ]
+    'required': ['name', 'description']
   }
 };
 

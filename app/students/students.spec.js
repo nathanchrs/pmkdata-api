@@ -32,10 +32,13 @@ describe('student handling', function () {
       'name': 'Ray Andrew',
       'gender': 'male',
       'birth_date': '1997-11-11',
-      'phone': '081933292950',
+      'phone': '081911111111',
+      'parent_phone': '081911111111',
       'line': 'rayandrew',
       'high_school': 'SMA St.Thomas 1 Medan',
-      'church': 'GKI Maulana Yusuf Bandung'
+      'church': 'GKI Maulana Yusuf Bandung',
+      'bandung_address': 'Jalan Ganesha no 10',
+      'hometown_address': 'Jalan Sisingamangaraja Medan'
     };
 
     it('should return 201 after creating new student', (done) => {
@@ -45,8 +48,7 @@ describe('student handling', function () {
         expect(res).to.be.a('object');
         expect(res.body).to.be.a('object');
         expect(res.body).to.haveOwnProperty('created_at');
-        expect(res.body).to.haveOwnProperty('updated_at');
-        expect(res.body.name).to.equal('Ray Andrew');
+        expect(res.body.line).to.equal('rayandrew');
         done();
       });
     });

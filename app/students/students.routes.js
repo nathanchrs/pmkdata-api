@@ -28,7 +28,7 @@ router.get('/students', auth.middleware.isSupervisor, validators.listStudents, (
  * @route {POST} /students
  */
 router.post('/students', validators.createStudent, (req, res, next) => {
-  let newStudent = _.pick(req.body, ['tpb_nim', 'nim', 'year', 'department', 'name', 'gender', 'birth_date', 'phone', 'line', 'high_school', 'church']);
+  let newStudent = _.pick(req.body, ['tpb_nim', 'nim', 'year', 'department', 'name', 'gender', 'birth_date', 'phone', 'line', 'high_school', 'church', 'bandung_address', 'hometown_address', 'parent_phone']);
   newStudent.created_at = newStudent.updated_at = new Date();
 
   return queries.createStudent(newStudent)
@@ -60,7 +60,7 @@ router.get('/students/:id', auth.middleware.isSupervisor, (req, res, next) => {
  * @route {PATCH} /students/:id
  */
 router.patch('/students/:id', auth.middleware.isSupervisor, validators.updateStudent, (req, res, next) => {
-  let studentUpdates = _.pick(req.body, ['tpb_nim', 'nim', 'year', 'department', 'name', 'gender', 'birth_date', 'phone', 'line', 'high_school', 'church']);
+  let studentUpdates = _.pick(req.body, ['tpb_nim', 'nim', 'year', 'department', 'name', 'gender', 'birth_date', 'phone', 'line', 'high_school', 'church', 'bandung_address', 'hometown_address', 'parent_phone']);
   studentUpdates.updated_at = new Date();
 
   return queries.updateStudent(req.params.id, studentUpdates)

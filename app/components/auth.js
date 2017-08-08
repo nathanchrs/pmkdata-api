@@ -10,6 +10,7 @@ const errors = require('http-errors');
 const predicates = {
   isSupervisor: (user) => (user.role && (user.role === 'admin' || user.role === 'supervisor')),
   isAdmin: (user) => (user.role && user.role === 'admin'),
+  isUser: (user) => (user.role && user.role === 'user'),
 
   isActive: (user) => (user.status && user.status === 'active'),
   isAwaitingValidation: (user) => (user.status && user.status === 'awaiting-validation'),
@@ -58,7 +59,12 @@ const middleware = {
   /**
    * Middleware that checks whether the user is an admin.
    */
-  isAdmin: createMiddlewareFromPredicate(predicates.isAdmin)
+  isAdmin: createMiddlewareFromPredicate(predicates.isAdmin),
+
+  /**
+   * Middleware that checks whether the user is an user.
+   */
+  isUser: createMiddlewareFromPredicate(predicates.isUser)
 };
 
 module.exports = {

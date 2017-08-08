@@ -8,12 +8,15 @@ exports.seed = function (knex, Promise) {
               year: 2015,
               department: 'STEI',
               name: 'dre',
-              gender: 'man',
+              gender: 'male',
               birth_date: '1997-11-11',
               phone: '0811234567',
+              parent_phone: '08111111',
               line: 'drees',
               high_school: 'SMA. <undefined>',
-              church: 'GKI MY'
+              church: 'GKI MY',
+              bandung_address: 'Jalan Ganesha no 10',
+              hometown_address: 'Jalan Sisingamangaraja Medan'
             })
           ]);
         });

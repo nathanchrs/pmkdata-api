@@ -4,6 +4,7 @@ exports.up = (knex, Promise) => {
       table.increments().primary();
       table.timestamp('time');
       table.text('notes');
+      table.string('tags');
       table.timestamps();
     })
   ]);

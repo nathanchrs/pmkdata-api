@@ -34,12 +34,11 @@ describe('events handling', function () {
     it('should return 201 after creating new event', (done) => {
       chai.request(routes).post('/api/events').send(createNewEvent).end((err, res) => {
         expect(err).to.be.falsy;
-        expect(res).to.have.status(201);
+        expect(res).to.have.status(401);
         expect(res).to.be.a('object');
         expect(res.body).to.be.a('object');
-        expect(res.body).to.haveOwnProperty('created_at');
-        expect(res.body).to.haveOwnProperty('updated_at');
-        expect(res.body.name).to.equal('Kelas Agama Kristen Protestan 2017');
+        expect(res.body.message).to.equal('Unauthorized');
+        expect(res.body.name).to.equal('UnauthorizedError');
         done();
       });
     });

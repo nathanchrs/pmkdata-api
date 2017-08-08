@@ -32,15 +32,14 @@ describe('mentees handling', function () {
       'notes': 'Mentoring Agama 2017'
     };
 
-    it('should return 201 after creating new mentee', (done) => {
+    it('should not create new mentee if not logged in', (done) => {
       chai.request(routes).post('/api/mentees').send(createNewMentee).end((err, res) => {
         expect(err).to.be.falsy;
-        expect(res).to.have.status(201);
+        expect(res).to.have.status(401);
         expect(res).to.be.a('object');
         expect(res.body).to.be.a('object');
-        expect(res.body).to.haveOwnProperty('created_at');
-        expect(res.body).to.haveOwnProperty('updated_at');
-        expect(res.body.notes).to.equal('Mentoring Agama 2017');
+        expect(res.body.message).to.equal('Unauthorized');
+        expect(res.body.name).to.equal('UnauthorizedError');
         done();
       });
     });

@@ -15,20 +15,23 @@ const schemas = {
     'type': 'object',
     'properties': {
       'mentor_username': commonSchemas.username,
-      'event_id': commonSchemas.number()
+      'event_id': commonSchemas.number(),
+      'status': commonSchemas.userStatus
     },
-    'required': ['mentor_username', 'event_id']
+    'required': ['mentor_username', 'event_id', 'status']
   },
 
   updateMentor: {
     'type': 'object',
     'properties': {
       'mentor_username': commonSchemas.username,
-      'event_id': commonSchemas.number()
+      'event_id': commonSchemas.number(),
+      'status': commonSchemas.userStatus
     },
     'anyOf': [
       { 'required': ['mentor_username'] },
-      { 'required': ['event_id'] }
+      { 'required': ['event_id'] },
+      { 'required': ['status'] }
     ]
   }
 };

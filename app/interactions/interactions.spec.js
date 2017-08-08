@@ -28,18 +28,18 @@ describe('interactions handling', function () {
   describe('new interaction', function () {
     let createNewInteraction = {
       time: '2017-08-04T08:41:56.233Z', // 04-08-2017 15:42 GMT+7
-      notes: 'Laporan kelas agama'
+      notes: 'Laporan kelas agama',
+      tags: 'Kelas Agama'
     };
 
-    it('should return 201 after creating new interaction', (done) => {
+    it('should not create new interaction if not logged in', (done) => {
       chai.request(routes).post('/api/interactions').send(createNewInteraction).end((err, res) => {
         expect(err).to.be.falsy;
-        expect(res).to.have.status(201);
+        expect(res).to.have.status(401);
         expect(res).to.be.a('object');
         expect(res.body).to.be.a('object');
-        expect(res.body).to.haveOwnProperty('created_at');
-        expect(res.body).to.haveOwnProperty('updated_at');
-        expect(res.body.notes).to.equal('Laporan kelas agama');
+        expect(res.body.message).to.equal('Unauthorized');
+        expect(res.body.name).to.equal('UnauthorizedError');
         done();
       });
     });
@@ -47,6 +47,7 @@ describe('interactions handling', function () {
     it('should not get specific interaction if not logged in', (done) => {
       chai.request(routes).post('/api/interactions').send(createNewInteraction).end((err, res) => {
         expect(err).to.be.falsy;
+        expect(res).to.have.status(401);
         chai.request(routes).get('/api/interactions/' + res.body.id).end((err, resfromget) => {
           expect(err).to.be.falsy;
           expect(resfromget).to.have.status(401);
@@ -60,6 +61,7 @@ describe('interactions handling', function () {
     it('should not get list of interactions if not logged in', (done) => {
       chai.request(routes).post('/api/interactions').send(createNewInteraction).end((err, res) => {
         expect(err).to.be.falsy;
+        expect(res).to.have.status(401);
         chai.request(routes).get('/api/interactions').end((err, resfromget) => {
           expect(err).to.be.falsy;
           expect(resfromget).to.have.status(401);
@@ -73,6 +75,7 @@ describe('interactions handling', function () {
     it('should not delete interaction if not logged in', (done) => {
       chai.request(routes).post('/api/interactions').send(createNewInteraction).end((err, res) => {
         expect(err).to.be.falsy;
+        expect(res).to.have.status(401);
         chai.request(routes).delete('/api/interactions/' + res.body.id).end((err, resfromdel) => {
           expect(err).to.be.falsy;
           expect(resfromdel).to.have.status(401);
@@ -86,6 +89,7 @@ describe('interactions handling', function () {
     it('should not edit interaction if not logged in', (done) => {
       chai.request(routes).post('/api/interactions').send(createNewInteraction).end((err, res) => {
         expect(err).to.be.falsy;
+        expect(res).to.have.status(401);
         chai.request(routes).patch('/api/interactions/' + res.body.id).send({ notes: 'Laporan kelas agama 2017' }).end((err, resfrompatch) => {
           expect(err).to.be.falsy;
           expect(resfrompatch).to.have.status(401);

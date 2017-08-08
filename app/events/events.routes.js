@@ -14,7 +14,7 @@ const router = express.Router();
  * @name Get events
  * @route {GET} /events
  */
-router.get('/events', auth.middleware.isSupervisor, validators.listEvents, (req, res, next) => {
+router.get('/events', auth.middleware.isUser, validators.listEvents, (req, res, next) => {
   return queries.listEvents(req.query.search, req.query.page, req.query.perPage, req.query.sort)
     .then((result) => {
       return res.json(result);
@@ -27,7 +27,7 @@ router.get('/events', auth.middleware.isSupervisor, validators.listEvents, (req,
  * @name Create event
  * @route {POST} /events
  */
-router.post('/events', validators.createEvent, (req, res, next) => {
+router.post('/events', auth.middleware.isSupervisor, validators.createEvent, (req, res, next) => {
   let newEvent = _.pick(req.body, ['name', 'description']);
   newEvent.created_at = newEvent.updated_at = new Date();
 
@@ -45,10 +45,10 @@ router.post('/events', validators.createEvent, (req, res, next) => {
  * @name Get event info
  * @route {GET} /events/:id
  */
-router.get('/events/:id', auth.middleware.isSupervisor, (req, res, next) => {
+router.get('/events/:id', auth.middleware.isUser, (req, res, next) => {
   return queries.getEvent(req.params.id)
     .then((event) => {
-      if (!event) return next(new errors.NotFound('Event not found. '));
+      if (!event) return next(new errors.NotFound('Event not found.'));
       return res.json(event);
     })
     .catch(next);

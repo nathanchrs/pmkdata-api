@@ -17,6 +17,11 @@ const schemas = {
     };
   },
 
+  department: {
+    'type': 'string',
+    'enum': ['FITB', 'FMIPA', 'FSRD', 'FTI', 'FTMD', 'FTTM', 'FTSL', 'SAPPK', 'SBM', 'SF', 'SITH', 'STEI']
+  },
+
   datetime: {
     'type': 'string',
     'format': 'date-time'
@@ -50,7 +55,7 @@ const schemas = {
   },
 
   nim: {
-    'type': 'integer',
+    'type': ['integer', 'null'],
     'minimum': 10000000,
     'maximum': 20000000
   },

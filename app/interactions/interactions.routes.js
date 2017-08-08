@@ -14,7 +14,7 @@ const router = express.Router();
  * @name Get interactions
  * @route {GET} /interactions
  */
-router.get('/interactions', auth.middleware.isSupervisor, validators.listInteractions, (req, res, next) => {
+router.get('/interactions', auth.middleware.isUser, validators.listInteractions, (req, res, next) => {
   return queries.listInteractions(req.query.search, req.query.page, req.query.perPage, req.query.sort)
     .then((result) => {
       return res.json(result);
@@ -27,8 +27,8 @@ router.get('/interactions', auth.middleware.isSupervisor, validators.listInterac
  * @name Create interaction
  * @route {POST} /interactions
  */
-router.post('/interactions', validators.createInteraction, (req, res, next) => {
-  let newInteraction = _.pick(req.body, ['time', 'notes']);
+router.post('/interactions', auth.middleware.isUser, validators.createInteraction, (req, res, next) => {
+  let newInteraction = _.pick(req.body, ['time', 'notes', 'tags']);
   newInteraction.created_at = newInteraction.updated_at = new Date();
 
   return queries.createInteraction(newInteraction)
@@ -45,10 +45,10 @@ router.post('/interactions', validators.createInteraction, (req, res, next) => {
  * @name Get interaction info
  * @route {GET} /interactions/:id
  */
-router.get('/interactions/:id', auth.middleware.isSupervisor, (req, res, next) => {
+router.get('/interactions/:id', auth.middleware.isUser, (req, res, next) => {
   return queries.getInteraction(req.params.id)
     .then((interaction) => {
-      if (!interaction) return next(new errors.NotFound('Interaction not found. '));
+      if (!interaction) return next(new errors.NotFound('Interaction not found.'));
       return res.json(interaction);
     })
     .catch(next);
@@ -59,8 +59,9 @@ router.get('/interactions/:id', auth.middleware.isSupervisor, (req, res, next) =
  * @name Update interaction
  * @route {PATCH} /interactions/:id
  */
-router.patch('/interactions/:id', auth.middleware.isSupervisor, validators.updateInteraction, (req, res, next) => {
-  let interactionUpdates = _.pick(req.body, ['time', 'notes']);
+router.patch('/interactions/:id', auth.middleware.isUser, validators.updateInteraction, (req, res, next) => {
+  let interactionUpdates = _.pick(req.body, ['time', 'notes', 'tags']);
+  interactionUpdates.time = new Date(interactionUpdates.time);
   interactionUpdates.updated_at = new Date();
 
   return queries.updateInteraction(req.params.id, interactionUpdates)
@@ -75,7 +76,7 @@ router.patch('/interactions/:id', auth.middleware.isSupervisor, validators.updat
  * @name Delete interaction
  * @route {DELETE} /interactions/:id
  */
-router.delete('/interactions/:id', auth.middleware.isSupervisor, (req, res, next) => {
+router.delete('/interactions/:id', auth.middleware.isUser, (req, res, next) => {
   return queries.deleteInteraction(req.params.id)
     .then((affectedRowCount) => {
       return res.json({ affectedRowCount: affectedRowCount });

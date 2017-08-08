@@ -31,15 +31,14 @@ describe('mentors handling', function () {
       event_id: 2
     };
 
-    it('should return 201 after creating new mentor', (done) => {
+    it('should not create new mentor if not logged in', (done) => {
       chai.request(routes).post('/api/mentors').send(createNewMentor).end((err, res) => {
         expect(err).to.be.falsy;
-        expect(res).to.have.status(201);
+        expect(res).to.have.status(401);
         expect(res).to.be.a('object');
         expect(res.body).to.be.a('object');
-        expect(res.body).to.haveOwnProperty('created_at');
-        expect(res.body).to.haveOwnProperty('updated_at');
-        expect(res.body.mentor_username).to.equal('admin2');
+        expect(res.body.message).to.equal('Unauthorized');
+        expect(res.body.name).to.equal('UnauthorizedError');
         done();
       });
     });

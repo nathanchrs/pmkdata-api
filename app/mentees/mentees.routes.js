@@ -27,7 +27,7 @@ router.get('/mentees', auth.middleware.isSupervisor, validators.listMentees, (re
  * @name Create mentee
  * @route {POST} /mentees
  */
-router.post('/mentees', validators.createMentee, (req, res, next) => {
+router.post('/mentees', auth.middleware.isSupervisor, validators.createMentee, (req, res, next) => {
   let newMentee = _.pick(req.body, ['mentor_id', 'mentee_id', 'notes']);
   newMentee.created_at = newMentee.updated_at = new Date();
 

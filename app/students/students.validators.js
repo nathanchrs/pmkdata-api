@@ -17,16 +17,19 @@ const schemas = {
       'tpb_nim': commonSchemas.nim,
       'nim': commonSchemas.nim,
       'year': commonSchemas.year,
-      'department': commonSchemas.varchar(255),
+      'department': commonSchemas.department,
       'name': commonSchemas.varchar(255),
       'gender': commonSchemas.gender,
       'birth_date': commonSchemas.date,
       'phone': commonSchemas.phone,
       'line': commonSchemas.line,
       'high_school': commonSchemas.varchar(255),
-      'church': commonSchemas.varchar(255)
+      'church': commonSchemas.varchar(255),
+      'bandung_address': commonSchemas.varchar(255),
+      'hometown_address': commonSchemas.varchar(255),
+      'parent_phone': commonSchemas.phone
     },
-    'required': ['year', 'department', 'name', 'gender', 'birth_date', 'phone', 'line', 'high_school', 'church']
+    'required': ['year', 'department', 'name', 'gender', 'birth_date', 'phone', 'line', 'high_school', 'church', 'bandung_address', 'hometown_address', 'parent_phone']
   },
 
   updateStudent: {
@@ -35,14 +38,17 @@ const schemas = {
       'tpb_nim': commonSchemas.nim,
       'nim': commonSchemas.nim,
       'year': commonSchemas.year,
-      'department': commonSchemas.varchar(255),
+      'department': commonSchemas.department,
       'name': commonSchemas.varchar(255),
       'gender': commonSchemas.gender,
       'birth_date': commonSchemas.date,
       'phone': commonSchemas.phone,
       'line': commonSchemas.line,
       'high_school': commonSchemas.varchar(255),
-      'church': commonSchemas.varchar(255)
+      'church': commonSchemas.varchar(255),
+      'bandung_address': commonSchemas.varchar(255),
+      'hometown_address': commonSchemas.varchar(255),
+      'parent_phone': commonSchemas.phone
     },
     'anyOf': [
       { 'required': ['tpb_nim'] },
@@ -55,7 +61,10 @@ const schemas = {
       { 'required': ['phone'] },
       { 'required': ['line'] },
       { 'required': ['high_school'] },
-      { 'required': ['church'] }
+      { 'required': ['church'] },
+      { 'required': ['bandung_adddress'] },
+      { 'required': ['hometown_address'] },
+      { 'required': ['parent_phone'] }
     ]
   }
 

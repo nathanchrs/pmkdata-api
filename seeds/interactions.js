@@ -6,11 +6,13 @@ exports.seed = function (knex, Promise) {
           let interactions = [
             {
               time: '2017-08-12 08:00:00', // YYYY-MM-DD HH:MM:SS
-              notes: 'Laporan mahasiswa baru ITB'
+              notes: 'Laporan mahasiswa baru ITB',
+              tags: 'PMB'
             },
             {
               time: '2017-08-12 09:00:00', // YYYY-MM-DD HH:MM:SS
-              notes: 'Eval PMB 2017'
+              notes: 'Eval PMB 2017',
+              tags: 'PMB'
             }
           ];
           return Promise.all([
