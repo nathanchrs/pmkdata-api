@@ -13,9 +13,9 @@ const schemas = {
   varchar: (length) => {
     let schema = {
       'type': 'string'
-    }
+    };
 
-    if(length) schema.maxLength = length;
+    if (length) schema.maxLength = length;
     return schema;
   },
 

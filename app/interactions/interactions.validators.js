@@ -15,20 +15,23 @@ const schemas = {
     'type': 'object',
     'properties': {
       'time': commonSchemas.datetime,
-      'notes': commonSchemas.varchar()
+      'notes': commonSchemas.varchar(),
+      'tags': commonSchemas.varchar(255)
     },
-    'required': ['time', 'notes']
+    'required': ['time', 'notes', 'tags']
   },
 
   updateInteraction: {
     'type': 'object',
     'properties': {
       'time': commonSchemas.datetime,
-      'notes': commonSchemas.varchar()
+      'notes': commonSchemas.varchar(),
+      'tags': commonSchemas.varchar(255)
     },
     'anyOf': [
       { 'required': ['time'] },
-      { 'required': ['notes'] }
+      { 'required': ['notes'] },
+      { 'required': ['tags'] }
     ]
   }
 };
