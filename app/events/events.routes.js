@@ -14,7 +14,7 @@ const router = express.Router();
  * @name Get events
  * @route {GET} /events
  */
-router.get('/events', auth.middleware.isUser, validators.listEvents, (req, res, next) => {
+router.get('/events', auth.middleware.isLoggedIn, validators.listEvents, (req, res, next) => {
   return queries.listEvents(req.query.search, req.query.page, req.query.perPage, req.query.sort)
     .then((result) => {
       return res.json(result);

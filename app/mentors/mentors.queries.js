@@ -4,10 +4,10 @@ var knex = require('../components/knex.js');
 
 module.exports = {
   listMentors: (search, page, perPage, sort) => {
-    return knex.select('id', 'mentor_username', 'event_id', 'created_at', 'updated_at')
+    return knex.select('id', 'mentor_username', 'event_id', 'status', 'created_at', 'updated_at')
       .from('mentors')
-      .search(search, ['id', 'mentor_username', 'event_id'])
-      .pageAndSort(page, perPage, sort, ['id', 'mentor_username', 'event_id']);
+      .search(search, ['id', 'mentor_username', 'event_id', 'status'])
+      .pageAndSort(page, perPage, sort, ['id', 'mentor_username', 'event_id', 'status']);
   },
 
   createMentor: (newMentor) => {
@@ -15,7 +15,7 @@ module.exports = {
   },
 
   getMentor: (id) => {
-    return knex.select('id', 'mentor_username', 'event_id', 'created_at', 'updated_at')
+    return knex.select('id', 'mentor_username', 'event_id', 'status', 'created_at', 'updated_at')
       .from('mentors')
       .where('id', id)
       .first();

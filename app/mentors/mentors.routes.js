@@ -32,7 +32,7 @@ router.get('/mentors', auth.middleware.isSupervisor, validators.listMentors, (re
  * @name Create mentor
  * @route {POST} /mentors
  */
-router.post('/mentors', auth.middleware.isUser, validators.createMentor, (req, res, next) => {
+router.post('/mentors', auth.middleware.isLoggedIn, validators.createMentor, (req, res, next) => {
   let newMentor = _.pick(req.body, ['mentor_username', 'event_id']);
   newMentor.status = 'awaiting_validation';
   newMentor.created_at = newMentor.updated_at = new Date();

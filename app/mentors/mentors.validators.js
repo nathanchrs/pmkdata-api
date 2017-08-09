@@ -15,10 +15,9 @@ const schemas = {
     'type': 'object',
     'properties': {
       'mentor_username': commonSchemas.username,
-      'event_id': commonSchemas.number(),
-      'status': commonSchemas.userStatus
+      'event_id': commonSchemas.number()
     },
-    'required': ['mentor_username', 'event_id', 'status']
+    'required': ['mentor_username', 'event_id']
   },
 
   updateMentor: {
