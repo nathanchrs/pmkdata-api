@@ -19,8 +19,8 @@ const isOwnerOrSupervisor = auth.createMiddlewareFromPredicate((user, req) => {
  * @name Get mentors
  * @route {GET} /mentors
  */
-router.get('/mentors', auth.middleware.isSupervisor, validators.listMentors, (req, res, next) => {
-  return queries.listMentors(req.query.search, req.query.page, req.query.perPage, req.query.sort)
+router.get('/mentors', auth.middleware.isLoggedIn, validators.listMentors, (req, res, next) => {
+  return queries.listMentors(req.query.search, req.query.page, req.query.perPage, req.query.sort, req.query.filter)
     .then((result) => {
       return res.json(result);
     })

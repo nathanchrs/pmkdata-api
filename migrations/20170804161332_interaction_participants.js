@@ -3,9 +3,9 @@ exports.up = (knex, Promise) => {
     knex.schema.createTable('interaction_participants', table => {
       table.increments().primary();
       table.integer('interaction_id').unsigned().notNullable();
-      // foreign key reserve here (primary key from interactions table) -- unsigned because of mysql
       table.integer('mentee_id').unsigned().notNullable().unique();
-      // foreign key reserve here (primary key from students table, unique) -- unsigned because of mysql
+      table.foreign('interaction_id').references('interactions.id').onDelete('RESTRICT');
+      table.foreign('mentee_id').references('mentees.id').onDelete('RESTRICT');
       table.timestamps();
     })
   ]);

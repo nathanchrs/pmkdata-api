@@ -23,16 +23,6 @@ exports.seed = (knex, Promise) => {
       return Promise.all([
         // Inserts seed entries
         knex('users').insert(users)
-        /* knex('mentors').del()
-          .then(() => {
-             return Promise.all([
-               knex('mentors').insert({
-                mentor_username: 'admin',
-                event_id: 1,
-                status: 'active'
-              })
-             ])
-          }) foreign key */
       ]);
     });
 };

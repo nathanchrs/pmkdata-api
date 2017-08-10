@@ -53,7 +53,7 @@
         "semistandard": "^11.0.0",
         "sinon": "^2.3.5",
         "sinon-chai": "^2.11.0",
-        "sqlite3": "^3.1.8"
+        "sqlite3": "^3.1.9"
     },
     "semistandard": {
         "env": {
