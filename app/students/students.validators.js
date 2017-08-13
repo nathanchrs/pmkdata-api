@@ -22,11 +22,14 @@ const schemas = {
       'gender': commonSchemas.gender,
       'birth_date': commonSchemas.date,
       'phone': commonSchemas.phone,
+      'parent_phone': commonSchemas.phone,
       'line': commonSchemas.line,
+      'current_address': commonSchemas.text,
+      'hometown_address': commonSchemas.text,
       'high_school': commonSchemas.varchar(255),
       'church': commonSchemas.varchar(255)
     },
-    'required': ['year', 'department', 'name', 'gender', 'birth_date', 'phone', 'line', 'high_school', 'church']
+    'required': ['year', 'department', 'name', 'gender', 'birth_date', 'phone', 'parent_phone', 'line', 'current_address', 'hometown_address', 'high_school', 'church']
   },
 
   updateStudent: {
@@ -40,23 +43,13 @@ const schemas = {
       'gender': commonSchemas.gender,
       'birth_date': commonSchemas.date,
       'phone': commonSchemas.phone,
+      'parent_phone': commonSchemas.phone,
       'line': commonSchemas.line,
+      'current_address': commonSchemas.text,
+      'hometown_address': commonSchemas.text,
       'high_school': commonSchemas.varchar(255),
       'church': commonSchemas.varchar(255)
-    },
-    'anyOf': [
-      { 'required': ['tpb_nim'] },
-      { 'required': ['nim'] },
-      { 'required': ['year'] },
-      { 'required': ['department'] },
-      { 'required': ['name'] },
-      { 'required': ['gender'] },
-      { 'required': ['birth_date'] },
-      { 'required': ['phone'] },
-      { 'required': ['line'] },
-      { 'required': ['high_school'] },
-      { 'required': ['church'] }
-    ]
+    }
   }
 
 };

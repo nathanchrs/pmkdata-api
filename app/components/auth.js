@@ -8,12 +8,12 @@
 const errors = require('http-errors');
 
 const predicates = {
-  isSupervisor: (user) => (user.role && (user.role === 'admin' || user.role === 'supervisor')),
-  isAdmin: (user) => (user.role && user.role === 'admin'),
+  isSupervisor: (user) => (user && user.role && (user.role === 'admin' || user.role === 'supervisor')),
+  isAdmin: (user) => (user && user.role && user.role === 'admin'),
 
-  isActive: (user) => (user.status && user.status === 'active'),
-  isAwaitingValidation: (user) => (user.status && user.status === 'awaiting-validation'),
-  isDisabled: (user) => (user.status && user.status === 'disabled')
+  isActive: (user) => (user && user.status && user.status === 'active'),
+  isAwaitingValidation: (user) => (user && user.status && user.status === 'awaiting-validation'),
+  isDisabled: (user) => (user && user.status && user.status === 'disabled')
 };
 
 /**

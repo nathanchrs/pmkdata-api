@@ -33,7 +33,10 @@ describe('student handling', function () {
       'gender': 'male',
       'birth_date': '1997-11-11',
       'phone': '081933292950',
+      'parent_phone': '081933292950',
       'line': 'rayandrew',
+      'current_address': 'Bandung',
+      'hometown_address': 'Hometown',
       'high_school': 'SMA St.Thomas 1 Medan',
       'church': 'GKI Maulana Yusuf Bandung'
     };

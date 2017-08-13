@@ -6,6 +6,7 @@ const errors = require('http-errors');
 const _ = require('lodash');
 const queries = require('./students.queries');
 const validators = require('./students.validators');
+const config = require('config');
 
 const router = express.Router();
 
@@ -23,18 +24,26 @@ router.get('/students', auth.middleware.isSupervisor, validators.listStudents, (
 });
 
 /**
- * Creates a new student
+ * Creates a new student. Can be accessed publicly if publicStudentRegistration config is true.
  * @name Create student
  * @route {POST} /students
  */
 router.post('/students', validators.createStudent, (req, res, next) => {
-  let newStudent = _.pick(req.body, ['tpb_nim', 'nim', 'year', 'department', 'name', 'gender', 'birth_date', 'phone', 'line', 'high_school', 'church']);
-  newStudent.created_at = newStudent.updated_at = new Date();
+  const publicStudentRegistration = config.get('publicStudentRegistration');
+  const isSupervisor = auth.predicates.isSupervisor(req.user);
+
+  if (!isSupervisor && !publicStudentRegistration) return next(new errors.Forbidden());
+
+  let editableColumns = ['tpb_nim', 'department', 'name', 'gender', 'birth_date', 'phone', 'parent_phone', 'line', 'current_address', 'hometown_address', 'high_school', 'church'];
+  if (isSupervisor) {
+    editableColumns = editableColumns.concat(['nim', 'year']);
+  } else if (publicStudentRegistration) {
+    req.body.year = (new Date()).getFullYear();
+  }
+  let newStudent = _.pick(req.body, editableColumns);
 
   return queries.createStudent(newStudent)
-    .then((insertedId) => {
-      let insertedStudent = newStudent;
-      insertedStudent['id'] = insertedId;
+    .then((insertedStudent) => {
       return res.status(201).json(insertedStudent);
     })
     .catch(next);
@@ -48,7 +57,7 @@ router.post('/students', validators.createStudent, (req, res, next) => {
 router.get('/students/:id', auth.middleware.isSupervisor, (req, res, next) => {
   return queries.getStudent(req.params.id)
     .then((student) => {
-      if (!student) return next(new errors.NotFound('Student not found. '));
+      if (!student) return next(new errors.NotFound('Student not found.'));
       return res.json(student);
     })
     .catch(next);
@@ -60,10 +69,7 @@ router.get('/students/:id', auth.middleware.isSupervisor, (req, res, next) => {
  * @route {PATCH} /students/:id
  */
 router.patch('/students/:id', auth.middleware.isSupervisor, validators.updateStudent, (req, res, next) => {
-  let studentUpdates = _.pick(req.body, ['tpb_nim', 'nim', 'year', 'department', 'name', 'gender', 'birth_date', 'phone', 'line', 'high_school', 'church']);
-  studentUpdates.updated_at = new Date();
-
-  return queries.updateStudent(req.params.id, studentUpdates)
+  return queries.updateStudent(req.params.id, req.body)
     .then((affectedRowCount) => {
       return res.json({ affectedRowCount: affectedRowCount });
     })

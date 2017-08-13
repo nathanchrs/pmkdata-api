@@ -1,20 +1,32 @@
 'use strict';
 
 const schemas = {
-  number: (min, max) => {
-    let schema = {
-      'type': 'integer'
-    };
-    if (min) schema.minimum = min;
-    if (max) schema.maximum = max;
-    return schema;
+  auto_id: {
+    'type': 'integer',
+    'minimum': 0
   },
 
   varchar: (length) => {
-    return {
-      'type': 'string',
-      'maxLength': length
+    let schema = {
+      'type': 'string'
     };
+
+    if (length) schema.maxLength = length;
+    return schema;
+  },
+
+  text: {
+    'type': 'string'
+  },
+
+  department: {
+    'type': 'string',
+    'enum': ['FITB', 'FMIPA', 'FSRD', 'FTI', 'FTMD', 'FTTM', 'FTSL', 'SAPPK', 'SBM', 'SF', 'SITH', 'STEI']
+  },
+
+  datetime: {
+    'type': 'string',
+    'format': 'date-time'
   },
 
   date: {
@@ -45,7 +57,7 @@ const schemas = {
   },
 
   nim: {
-    'type': 'integer',
+    'type': ['integer', 'null'],
     'minimum': 10000000,
     'maximum': 20000000
   },

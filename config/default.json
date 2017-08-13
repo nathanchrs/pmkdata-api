@@ -28,6 +28,9 @@
       "timestamp": true
     }
   },
+
+  "publicUserRegistration": true,
+  "publicStudentRegistration": true,
   
   "routePrefix": "/api"
 }
