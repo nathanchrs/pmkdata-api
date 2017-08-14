@@ -42,6 +42,8 @@ router.post('/students', validators.createStudent, (req, res, next) => {
   }
   let newStudent = _.pick(req.body, editableColumns);
 
+  if (newStudent.tpb_nim && !newStudent.nim) newStudent.nim = newStudent.tpb_nim;
+
   return queries.createStudent(newStudent)
     .then((insertedStudent) => {
       return res.status(201).json(insertedStudent);

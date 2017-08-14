@@ -75,4 +75,70 @@ router.delete('/interactions/:id', isInteractionMentorOrSupervisor, (req, res, n
     .catch(next);
 });
 
+/**
+ * Get list of mentors for the given interaction.
+ * @name Get interaction mentors
+ * @route {GET} /interactions/:id/mentors
+ */
+router.get('/interactions/:id/mentors', isInteractionMentorOrSupervisor, (req, res, next) => {
+  return queries.listInteractionMentors(req.params.id)
+    .then(result => res.json(result))
+    .catch(next);
+});
+
+/**
+ * Add a mentor for the given interaction.
+ * @name Add interaction mentor
+ * @route {POST} /interactions/:id/mentors
+ */
+router.post('/interactions/:id/mentors', isInteractionMentorOrSupervisor, validators.addInteractionMentor, (req, res, next) => {
+  return queries.addInteractionMentor(req.params.id, req.body.user_id)
+    .then(insertedInteractionMentor => res.status(201).json(insertedInteractionMentor))
+    .catch(next);
+});
+
+/**
+ * Remove a mentor from the given interaction.
+ * @name Remove interaction mentor
+ * @route {DELETE} /interactions/:id/mentors
+ */
+router.delete('/interactions/:id/mentors/:userId', isInteractionMentorOrSupervisor, (req, res, next) => {
+  return queries.removeInteractionMentor(req.params.id, req.params.userId)
+    .then(affectedRowCount => res.json({ affectedRowCount: affectedRowCount }))
+    .catch(next);
+});
+
+/**
+ * Get list of participants for the given interaction ID.
+ * @name Get interaction participants
+ * @route {GET} /interactions/:id/participants
+ */
+router.get('/interactions/:id/participants', isInteractionMentorOrSupervisor, (req, res, next) => {
+  return queries.listInteractionParticipants(req.params.id)
+    .then(result => res.json(result))
+    .catch(next);
+});
+
+/**
+ * Add a participant for the given interaction.
+ * @name Add interaction participant
+ * @route {POST} /interactions/:id/participants
+ */
+router.post('/interactions/:id/participants', isInteractionMentorOrSupervisor, validators.addInteractionParticipant, (req, res, next) => {
+  return queries.addInteractionParticipant(req.params.id, req.body.student_id)
+    .then(insertedInteractionParticipant => res.status(201).json(insertedInteractionParticipant))
+    .catch(next);
+});
+
+/**
+ * Remove a participant from the given interaction.
+ * @name Remove interaction participant
+ * @route {DELETE} /interactions/:id/participants
+ */
+router.delete('/interactions/:id/participants/:studentId', isInteractionMentorOrSupervisor, (req, res, next) => {
+  return queries.removeInteractionParticipant(req.params.id, req.params.studentId)
+    .then(affectedRowCount => res.json({ affectedRowCount: affectedRowCount }))
+    .catch(next);
+});
+
 module.exports = router;

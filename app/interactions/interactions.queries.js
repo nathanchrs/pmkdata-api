@@ -9,19 +9,10 @@ const interactionAssignableColumns = ['time', 'title', 'notes', 'tags'];
 const interactionSearchableColumns = ['id', 'time', 'title', 'notes', 'tags'];
 const interactionSortableColumns = ['id', 'time', 'title', 'tags', 'created_at', 'updated_at'];
 
-// const interactionMentorColumns = ['id', 'interaction_id', 'user_id', 'created_at', 'updated_at'];
-// const interactionParticipantColumns = ['id', 'interaction_id', 'user_id', 'created_at', 'updated_at'];
+const interactionMentorColumns = ['id', 'interaction_id', 'user_id', 'created_at', 'updated_at'];
+const interactionParticipantColumns = ['id', 'interaction_id', 'student_id', 'created_at', 'updated_at'];
 
 module.exports = {
-  isInteractionMentor: (interactionId, userId) => {
-    knex.select('id')
-      .from('interaction_mentors')
-      .where('interaction_id', interactionId)
-      .andWhere('user_id', userId)
-      .first()
-      .then(interactionMentor => !!interactionMentor);
-  },
-
   listInteractions: (search, page, perPage, sort, filterByMentorId) => {
     let query = knex.select(interactionColumns).from('interactions');
 
@@ -56,6 +47,56 @@ module.exports = {
 
   deleteInteraction: (id) => {
     return knex('interactions').delete().where('id', id);
+  },
+
+  isInteractionMentor: (interactionId, userId) => {
+    knex.select('id')
+      .from('interaction_mentors')
+      .where('interaction_id', interactionId)
+      .andWhere('user_id', userId)
+      .first()
+      .then(interactionMentor => !!interactionMentor);
+  },
+
+  listInteractionMentors: (interactionId) => {
+    return knex.select(interactionMentorColumns.concat(['username', 'name', 'department', 'year']))
+      .from('interaction_mentors')
+      .where('interaction_id', interactionId)
+      .leftJoin('users', 'interaction_mentors.user_id', 'users.id')
+      .leftJoin('students', 'users.nim', 'students.nim');
+  },
+
+  addInteractionMentor: (interactionId, userId) => {
+    let newInteractionMentor = { interaction_id: interactionId, mentor_id: userId };
+    newInteractionMentor.created_at = newInteractionMentor.updated_at = new Date();
+    return knex('interaction_mentors').insert(newInteractionMentor)
+      .then(insertedIds => Object.assign(newInteractionMentor, { id: insertedIds[0] }));
+  },
+
+  removeInteractionMentor: (interactionId, userId) => {
+    return knex('interaction_mentors').delete()
+      .where('interaction_id', interactionId)
+      .andWhere('user_id', userId);
+  },
+
+  listInteractionParticipants: (interactionId) => {
+    return knex.select(interactionParticipantColumns.concat(['name', 'department', 'year']))
+      .from('interaction_participants')
+      .where('interaction_id', interactionId)
+      .leftJoin('students', 'interaction_participants.student_id', 'students.id');
+  },
+
+  addInteractionParticipant: (interactionId, studentId) => {
+    let newInteractionParticipant = { interaction_id: interactionId, student_id: studentId };
+    newInteractionParticipant.created_at = newInteractionParticipant.updated_at = new Date();
+    return knex('interaction_participants').insert(newInteractionParticipant)
+      .then(insertedIds => Object.assign(newInteractionParticipant, { id: insertedIds[0] }));
+  },
+
+  removeInteractionParticipant: (interactionId, studentId) => {
+    return knex('interaction_participants').delete()
+      .where('interaction_id', interactionId)
+      .andWhere('student_id', studentId);
   }
 
 };

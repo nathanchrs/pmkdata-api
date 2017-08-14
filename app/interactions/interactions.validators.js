@@ -15,24 +15,37 @@ const schemas = {
     'type': 'object',
     'properties': {
       'time': commonSchemas.datetime,
+      'title': commonSchemas.varchar(255),
       'notes': commonSchemas.text,
       'tags': commonSchemas.varchar(255)
     },
-    'required': ['time', 'notes', 'tags']
+    'required': ['time', 'title', 'notes', 'tags']
   },
 
   updateInteraction: {
     'type': 'object',
     'properties': {
       'time': commonSchemas.datetime,
+      'title': commonSchemas.varchar(255),
       'notes': commonSchemas.text,
       'tags': commonSchemas.varchar(255)
+    }
+  },
+
+  addInteractionMentor: {
+    'type': 'object',
+    'properties': {
+      'user_id': commonSchemas.auto_id
     },
-    'anyOf': [
-      { 'required': ['time'] },
-      { 'required': ['notes'] },
-      { 'required': ['tags'] }
-    ]
+    'required': ['user_id']
+  },
+
+  addInteractionParticipant: {
+    'type': 'object',
+    'properties': {
+      'student_id': commonSchemas.auto_id
+    },
+    'required': ['student_id']
   }
 };
 
