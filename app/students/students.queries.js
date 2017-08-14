@@ -34,7 +34,7 @@ module.exports = {
   createStudent: (newStudent) => {
     newStudent = _.pick(newStudent, studentAssignableColumns);
     newStudent.created_at = newStudent.updated_at = new Date();
-    return knex('students').insert(newStudent).then(insertedId => Object.assign(newStudent, { id: insertedId }));
+    return knex('students').insert(newStudent).then(insertedIds => Object.assign(newStudent, { id: insertedIds[0] }));
   },
 
   getStudent: (id) => {

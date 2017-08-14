@@ -52,7 +52,7 @@ module.exports = {
       })
       .then((hash) => {
         newUser.password = hash;
-        return knex('users').insert(newUser).then(insertedId => Object.assign(newUser, { id: insertedId, password: '' }));
+        return knex('users').insert(newUser).then(insertedIds => Object.assign(newUser, { id: insertedIds[0], password: '' }));
       });
   },
 

@@ -38,7 +38,7 @@ module.exports = {
   createInteraction: (newInteraction) => {
     newInteraction = _.pick(newInteraction, interactionAssignableColumns);
     newInteraction.created_at = newInteraction.updated_at = new Date();
-    return knex('interactions').insert(newInteraction).then(insertedId => Object.assign(newInteraction, { id: insertedId }));
+    return knex('interactions').insert(newInteraction).then(insertedIds => Object.assign(newInteraction, { id: insertedIds[0] }));
   },
 
   getInteraction: (id, filterByMentorId) => {
