@@ -19,10 +19,10 @@ function ensureOldPasswordIsCorrect (username, password) {
     });
 }
 
-const userColumns = ['username', 'nim', 'email', 'password', 'role', 'status', 'created_at', 'updated_at'];
+const userColumns = ['id', 'username', 'nim', 'email', 'password', 'role', 'status', 'created_at', 'updated_at'];
 const userAssignableColumns = ['username', 'nim', 'email', 'password', 'role', 'status'];
-const userSearchableColumns = ['username', 'nim', 'email'];
-const userSortableColumns = ['username', 'nim', 'email', 'role', 'status', 'created_at', 'updated_at'];
+const userSearchableColumns = ['id', 'username', 'nim', 'email'];
+const userSortableColumns = ['id', 'username', 'nim', 'email', 'role', 'status', 'created_at', 'updated_at'];
 
 module.exports = {
   listUsers: (search, page, perPage, sort) => {
@@ -52,7 +52,7 @@ module.exports = {
       })
       .then((hash) => {
         newUser.password = hash;
-        return knex('users').insert(newUser).then(insertedId => Object.assign(newUser, { password: '' }));
+        return knex('users').insert(newUser).then(insertedId => Object.assign(newUser, { id: insertedId, password: '' }));
       });
   },
 

@@ -15,10 +15,10 @@ const router = express.Router();
  * @route {GET} /interactions
  */
 router.get('/interactions', auth.middleware.isLoggedIn, validators.listInteractions, (req, res, next) => {
-  return queries.listInteractions(req.query.search, req.query.page, req.query.perPage, req.query.sort)
-    .then((result) => {
-      return res.json(result);
-    })
+  const isSupervisor = auth.predicates.isSupervisor(req.user);
+
+  return queries.listInteractions(isSupervisor ? false : req.user.id, req.query.search, req.query.page, req.query.perPage, req.query.sort)
+    .then(result => res.json(result))
     .catch(next);
 });
 
@@ -28,16 +28,8 @@ router.get('/interactions', auth.middleware.isLoggedIn, validators.listInteracti
  * @route {POST} /interactions
  */
 router.post('/interactions', auth.middleware.isLoggedIn, validators.createInteraction, (req, res, next) => {
-  let newInteraction = _.pick(req.body, ['time', 'notes', 'tags']);
-  newInteraction.time = new Date(newInteraction.time);
-  newInteraction.created_at = newInteraction.updated_at = new Date();
-
-  return queries.createInteraction(newInteraction)
-    .then((insertedId) => {
-      let insertedInteraction = newInteraction;
-      insertedInteraction['id'] = insertedId;
-      return res.status(201).json(insertedInteraction);
-    })
+  return queries.createInteraction(req.body)
+    .then(insertedInteraction => res.status(201).json(insertedInteraction))
     .catch(next);
 });
 

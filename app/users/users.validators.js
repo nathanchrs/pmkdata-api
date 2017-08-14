@@ -31,14 +31,7 @@ const schemas = {
       'role': commonSchemas.role,
       'oldPassword': commonSchemas.password,
       'newPassword': commonSchemas.password
-    },
-    'anyOf': [
-      {'required': ['nim']},
-      {'required': ['email']},
-      {'required': ['status']},
-      {'required': ['role']},
-      {'required': ['newPassword']}
-    ]
+    }
   }
 
 };
