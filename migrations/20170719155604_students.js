@@ -17,8 +17,6 @@ exports.up = (knex, Promise) => {
       table.text('hometown_address');
       table.string('high_school');
       table.string('church');
-      table.string('bandung_address');
-      table.string('hometown_address');
       table.timestamps();
     })
   ]);

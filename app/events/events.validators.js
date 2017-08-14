@@ -15,7 +15,7 @@ const schemas = {
     'type': 'object',
     'properties': {
       'name': commonSchemas.varchar(255),
-      'description': commonSchemas.varchar()
+      'description': commonSchemas.text
     },
     'required': ['name', 'description']
   },
@@ -24,9 +24,8 @@ const schemas = {
     'type': 'object',
     'properties': {
       'name': commonSchemas.varchar(255),
-      'description': commonSchemas.varchar(65535)
-    },
-    'required': ['name', 'description']
+      'description': commonSchemas.text
+    }
   }
 };
 

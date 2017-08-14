@@ -14,9 +14,9 @@ const schemas = {
   createMentee: {
     'type': 'object',
     'properties': {
-      'mentor_id': commonSchemas.number(),
-      'mentee_id': commonSchemas.number(),
-      'notes': commonSchemas.varchar(65535)
+      'mentor_id': commonSchemas.auto_id,
+      'mentee_id': commonSchemas.auto_id,
+      'notes': commonSchemas.text
     },
     'required': ['mentor_id', 'mentee_id', 'notes']
   },
@@ -24,9 +24,9 @@ const schemas = {
   updateMentee: {
     'type': 'object',
     'properties': {
-      'mentor_id': commonSchemas.number(),
-      'mentee_id': commonSchemas.number(),
-      'notes': commonSchemas.varchar()
+      'mentor_id': commonSchemas.auto_id,
+      'mentee_id': commonSchemas.auto_id,
+      'notes': commonSchemas.text
     },
     'anyOf': [
       { 'required': ['mentor_id'] },

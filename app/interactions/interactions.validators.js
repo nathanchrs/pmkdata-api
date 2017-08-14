@@ -15,7 +15,7 @@ const schemas = {
     'type': 'object',
     'properties': {
       'time': commonSchemas.datetime,
-      'notes': commonSchemas.varchar(),
+      'notes': commonSchemas.text,
       'tags': commonSchemas.varchar(255)
     },
     'required': ['time', 'notes', 'tags']
@@ -25,7 +25,7 @@ const schemas = {
     'type': 'object',
     'properties': {
       'time': commonSchemas.datetime,
-      'notes': commonSchemas.varchar(),
+      'notes': commonSchemas.text,
       'tags': commonSchemas.varchar(255)
     },
     'anyOf': [

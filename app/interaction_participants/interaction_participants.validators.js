@@ -14,8 +14,8 @@ const schemas = {
   createInteractionParticipant: {
     'type': 'object',
     'properties': {
-      'interaction_id': commonSchemas.number(),
-      'mentee_id': commonSchemas.number()
+      'interaction_id': commonSchemas.auto_id,
+      'mentee_id': commonSchemas.auto_id
     },
     'required': ['interaction_id', 'mentee_id']
   },
@@ -23,8 +23,8 @@ const schemas = {
   updateInteractionParticipant: {
     'type': 'object',
     'properties': {
-      'interaction_id': commonSchemas.number(),
-      'mentee_id': commonSchemas.number()
+      'interaction_id': commonSchemas.auto_id,
+      'mentee_id': commonSchemas.auto_id
     },
     'anyOf': [
       { 'required': ['interaction_id'] },

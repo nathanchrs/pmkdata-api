@@ -15,7 +15,7 @@ const schemas = {
     'type': 'object',
     'properties': {
       'mentor_username': commonSchemas.username,
-      'event_id': commonSchemas.number()
+      'event_id': commonSchemas.auto_id
     },
     'required': ['mentor_username', 'event_id']
   },
@@ -24,7 +24,7 @@ const schemas = {
     'type': 'object',
     'properties': {
       'mentor_username': commonSchemas.username,
-      'event_id': commonSchemas.number(),
+      'event_id': commonSchemas.auto_id,
       'status': commonSchemas.userStatus
     },
     'anyOf': [
