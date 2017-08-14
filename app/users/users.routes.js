@@ -4,8 +4,8 @@ const express = require('express');
 const auth = require('../components/auth.js');
 const validators = require('./users.validators.js');
 const errors = require('http-errors');
-const _ = require('lodash');
 const queries = require('./users.queries.js');
+const config = require('config');
 
 const router = express.Router();
 
@@ -33,14 +33,18 @@ router.get('/users', auth.middleware.isSupervisor, validators.listUsers, (req, r
  * @route {POST} /users
  */
 router.post('/users', validators.createUser, (req, res, next) => { // TODO: email/captcha validation
-  let newUser = _.pick(req.body, ['username', 'nim', 'email', 'password']);
-  newUser.role = 'user';
-  newUser.status = 'awaiting_validation';
-  newUser.created_at = newUser.updated_at = new Date();
+  const publicUserRegistration = config.get('publicUserRegistration');
+  const isSupervisor = auth.predicates.isSupervisor(req.user);
+  if (!isSupervisor && !publicUserRegistration) return next(new errors.Forbidden());
 
-  return queries.createUser(newUser)
-    .then((insertedUsernames) => {
-      return res.status(201).json(newUser);
+  if (!isSupervisor) {
+    req.body.role = 'user';
+    req.body.status = 'awaiting_validation';
+  }
+
+  return queries.createUser(req.body)
+    .then((insertedUser) => {
+      return res.status(201).json(insertedUser);
     })
     .catch(next);
 });
@@ -67,8 +71,7 @@ router.get('/users/:username', isOwnerOrSupervisor, (req, res, next) => {
 router.patch('/users/:username', isOwnerOrSupervisor, validators.updateUser, (req, res, next) => {
   let userUpdates = {
     email: req.body.email,
-    password: req.body.newPassword,
-    updated_at: new Date()
+    password: req.body.newPassword
   };
 
   // Supervisor can update all and don't need old password check for password changes, owner can't update status, role, NIM
