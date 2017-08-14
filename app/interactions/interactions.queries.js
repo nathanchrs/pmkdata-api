@@ -9,10 +9,28 @@ const interactionAssignableColumns = ['time', 'title', 'notes', 'tags'];
 const interactionSearchableColumns = ['id', 'time', 'title', 'notes', 'tags'];
 const interactionSortableColumns = ['id', 'time', 'title', 'tags', 'created_at', 'updated_at'];
 
+// const interactionMentorColumns = ['id', 'interaction_id', 'user_id', 'created_at', 'updated_at'];
+// const interactionParticipantColumns = ['id', 'interaction_id', 'user_id', 'created_at', 'updated_at'];
+
 module.exports = {
-  listInteractions: (filterParticipant, search, page, perPage, sort) => {
-    return knex.select(interactionColumns)
-      .from('interactions')
+  isInteractionMentor: (interactionId, userId) => {
+    knex.select('id')
+      .from('interaction_mentors')
+      .where('interaction_id', interactionId)
+      .andWhere('user_id', userId)
+      .first()
+      .then(interactionMentor => !!interactionMentor);
+  },
+
+  listInteractions: (search, page, perPage, sort, filterByMentorId) => {
+    let query = knex.select(interactionColumns).from('interactions');
+
+    if (filterByMentorId) {
+      query = query.leftJoin('interaction_mentors', 'interaction.id', 'interaction_mentors.interaction_id')
+        .where('interaction_mentors.user_id', filterByMentorId);
+    }
+
+    return query
       .search(search, interactionSearchableColumns)
       .pageAndSort(page, perPage, sort, interactionSortableColumns);
   },
@@ -23,7 +41,7 @@ module.exports = {
     return knex('interactions').insert(newInteraction).then(insertedId => Object.assign(newInteraction, { id: insertedId }));
   },
 
-  getInteraction: (id) => {
+  getInteraction: (id, filterByMentorId) => {
     return knex.select(interactionColumns)
       .from('interactions')
       .where('interactions.id', id)

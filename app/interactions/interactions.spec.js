@@ -38,7 +38,6 @@ describe('interactions handling', function () {
         expect(res).to.have.status(401);
         expect(res).to.be.a('object');
         expect(res.body).to.be.a('object');
-        expect(res.body.message).to.equal('Unauthorized');
         expect(res.body.name).to.equal('UnauthorizedError');
         done();
       });
@@ -51,7 +50,6 @@ describe('interactions handling', function () {
         chai.request(routes).get('/api/interactions/' + res.body.id).end((err, resfromget) => {
           expect(err).to.be.falsy;
           expect(resfromget).to.have.status(401);
-          expect(resfromget.body.message).to.equal('Unauthorized');
           expect(resfromget.body.name).to.equal('UnauthorizedError');
           done();
         });
@@ -65,7 +63,6 @@ describe('interactions handling', function () {
         chai.request(routes).get('/api/interactions').end((err, resfromget) => {
           expect(err).to.be.falsy;
           expect(resfromget).to.have.status(401);
-          expect(resfromget.body.message).to.equal('Unauthorized');
           expect(resfromget.body.name).to.equal('UnauthorizedError');
           done();
         });
@@ -79,7 +76,6 @@ describe('interactions handling', function () {
         chai.request(routes).delete('/api/interactions/' + res.body.id).end((err, resfromdel) => {
           expect(err).to.be.falsy;
           expect(resfromdel).to.have.status(401);
-          expect(resfromdel.body.message).to.equal('Unauthorized');
           expect(resfromdel.body.name).to.equal('UnauthorizedError');
           done();
         });
@@ -93,7 +89,6 @@ describe('interactions handling', function () {
         chai.request(routes).patch('/api/interactions/' + res.body.id).send({ notes: 'Laporan kelas agama 2017' }).end((err, resfrompatch) => {
           expect(err).to.be.falsy;
           expect(resfrompatch).to.have.status(401);
-          expect(resfrompatch.body.message).to.equal('Unauthorized');
           expect(resfrompatch.body.name).to.equal('UnauthorizedError');
           done();
         });

@@ -3,11 +3,16 @@
 const express = require('express');
 const auth = require('../components/auth.js');
 const errors = require('http-errors');
-const _ = require('lodash');
 const queries = require('./interactions.queries');
 const validators = require('./interactions.validators');
 
 const router = express.Router();
+
+/** Custom auth middleware that checks whether the accessing user is a participating mentor for this interaction. */
+const isInteractionMentorOrSupervisor = auth.createMiddlewareFromPredicate((user, req) => {
+  if (auth.predicates.isSupervisor(user)) return true;
+  return queries.isInteractionMentor(req.params.id, req.user.id);
+});
 
 /**
  * Get a list of interactions.
@@ -15,9 +20,8 @@ const router = express.Router();
  * @route {GET} /interactions
  */
 router.get('/interactions', auth.middleware.isLoggedIn, validators.listInteractions, (req, res, next) => {
-  const isSupervisor = auth.predicates.isSupervisor(req.user);
-
-  return queries.listInteractions(isSupervisor ? false : req.user.id, req.query.search, req.query.page, req.query.perPage, req.query.sort)
+  const filterByMentorId = auth.predicates.isSupervisor(req.user) ? false : req.user.id;
+  return queries.listInteractions(req.query.search, req.query.page, req.query.perPage, req.query.sort, filterByMentorId)
     .then(result => res.json(result))
     .catch(next);
 });
@@ -38,7 +42,7 @@ router.post('/interactions', auth.middleware.isLoggedIn, validators.createIntera
  * @name Get interaction info
  * @route {GET} /interactions/:id
  */
-router.get('/interactions/:id', auth.middleware.isLoggedIn, (req, res, next) => {
+router.get('/interactions/:id', isInteractionMentorOrSupervisor, (req, res, next) => {
   return queries.getInteraction(req.params.id)
     .then((interaction) => {
       if (!interaction) return next(new errors.NotFound('Interaction not found.'));
@@ -48,16 +52,12 @@ router.get('/interactions/:id', auth.middleware.isLoggedIn, (req, res, next) => 
 });
 
 /**
- * Updates interaction information for the given id.
+ * Update interaction information for the given id.
  * @name Update interaction
  * @route {PATCH} /interactions/:id
  */
-router.patch('/interactions/:id', auth.middleware.isLoggedIn, validators.updateInteraction, (req, res, next) => {
-  let interactionUpdates = _.pick(req.body, ['time', 'notes', 'tags']);
-  interactionUpdates.time = new Date(interactionUpdates.time);
-  interactionUpdates.updated_at = new Date();
-
-  return queries.updateInteraction(req.params.id, interactionUpdates)
+router.patch('/interactions/:id', isInteractionMentorOrSupervisor, validators.updateInteraction, (req, res, next) => {
+  return queries.updateInteraction(req.params.id, req.body)
     .then((affectedRowCount) => {
       return res.json({ affectedRowCount: affectedRowCount });
     })
@@ -69,11 +69,9 @@ router.patch('/interactions/:id', auth.middleware.isLoggedIn, validators.updateI
  * @name Delete interaction
  * @route {DELETE} /interactions/:id
  */
-router.delete('/interactions/:id', auth.middleware.isLoggedIn, (req, res, next) => {
+router.delete('/interactions/:id', isInteractionMentorOrSupervisor, (req, res, next) => {
   return queries.deleteInteraction(req.params.id)
-    .then((affectedRowCount) => {
-      return res.json({ affectedRowCount: affectedRowCount });
-    })
+    .then(affectedRowCount => res.json({ affectedRowCount: affectedRowCount }))
     .catch(next);
 });
 
