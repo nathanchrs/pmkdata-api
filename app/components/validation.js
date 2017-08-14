@@ -8,7 +8,8 @@ const Ajv = require('ajv');
 const errors = require('http-errors');
 
 const ajv = new Ajv({
-  coerceTypes: true
+  coerceTypes: true,
+  removeAdditional: true
 });
 
 module.exports = {

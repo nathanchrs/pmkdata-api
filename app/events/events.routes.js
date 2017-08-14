@@ -3,7 +3,6 @@
 const express = require('express');
 const auth = require('../components/auth.js');
 const errors = require('http-errors');
-const _ = require('lodash');
 const queries = require('./events.queries');
 const validators = require('./events.validators');
 
@@ -16,9 +15,7 @@ const router = express.Router();
  */
 router.get('/events', auth.middleware.isLoggedIn, validators.listEvents, (req, res, next) => {
   return queries.listEvents(req.query.search, req.query.page, req.query.perPage, req.query.sort)
-    .then((result) => {
-      return res.json(result);
-    })
+    .then(result => res.json(result))
     .catch(next);
 });
 
@@ -28,15 +25,8 @@ router.get('/events', auth.middleware.isLoggedIn, validators.listEvents, (req, r
  * @route {POST} /events
  */
 router.post('/events', auth.middleware.isSupervisor, validators.createEvent, (req, res, next) => {
-  let newEvent = _.pick(req.body, ['name', 'description']);
-  newEvent.created_at = newEvent.updated_at = new Date();
-
-  return queries.createEvent(newEvent)
-    .then((insertedId) => {
-      let insertedEvent = newEvent;
-      insertedEvent['id'] = insertedId;
-      return res.status(201).json(insertedEvent);
-    })
+  return queries.createEvent(req.body)
+    .then(insertedEvent => res.status(201).json(insertedEvent))
     .catch(next);
 });
 
@@ -45,9 +35,9 @@ router.post('/events', auth.middleware.isSupervisor, validators.createEvent, (re
  * @name Get event info
  * @route {GET} /events/:id
  */
-router.get('/events/:id', auth.middleware.isUser, (req, res, next) => {
+router.get('/events/:id', auth.middleware.isLoggedIn, (req, res, next) => {
   return queries.getEvent(req.params.id)
-    .then((event) => {
+    .then(event => {
       if (!event) return next(new errors.NotFound('Event not found.'));
       return res.json(event);
     })
@@ -60,13 +50,8 @@ router.get('/events/:id', auth.middleware.isUser, (req, res, next) => {
  * @route {PATCH} /events/:id
  */
 router.patch('/events/:id', auth.middleware.isSupervisor, validators.updateEvent, (req, res, next) => {
-  let eventUpdates = _.pick(req.body, ['name', 'description']);
-  eventUpdates.updated_at = new Date();
-
-  return queries.updateEvent(req.params.id, eventUpdates)
-    .then((affectedRowCount) => {
-      return res.json({ affectedRowCount: affectedRowCount });
-    })
+  return queries.updateEvent(req.params.id, req.body)
+    .then(affectedRowCount => res.json({ affectedRowCount: affectedRowCount }))
     .catch(next);
 });
 
@@ -77,9 +62,7 @@ router.patch('/events/:id', auth.middleware.isSupervisor, validators.updateEvent
  */
 router.delete('/events/:id', auth.middleware.isSupervisor, (req, res, next) => {
   return queries.deleteEvent(req.params.id)
-    .then((affectedRowCount) => {
-      return res.json({ affectedRowCount: affectedRowCount });
-    })
+    .then(affectedRowCount => res.json({ affectedRowCount: affectedRowCount }))
     .catch(next);
 });
 
