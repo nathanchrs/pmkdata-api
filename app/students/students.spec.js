@@ -32,13 +32,13 @@ describe('student handling', function () {
       'name': 'Ray Andrew',
       'gender': 'male',
       'birth_date': '1997-11-11',
-      'phone': '081911111111',
-      'parent_phone': '081911111111',
+      'phone': '081933292950',
+      'parent_phone': '081933292950',
       'line': 'rayandrew',
+      'current_address': 'Bandung',
+      'hometown_address': 'Hometown',
       'high_school': 'SMA St.Thomas 1 Medan',
-      'church': 'GKI Maulana Yusuf Bandung',
-      'bandung_address': 'Jalan Ganesha no 10',
-      'hometown_address': 'Jalan Sisingamangaraja Medan'
+      'church': 'GKI Maulana Yusuf Bandung'
     };
 
     it('should return 201 after creating new student', (done) => {

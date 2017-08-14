@@ -1,13 +1,9 @@
 'use strict';
 
 const schemas = {
-  number: (min, max) => {
-    let schema = {
-      'type': 'integer'
-    };
-    if (min) schema.minimum = min;
-    if (max) schema.maximum = max;
-    return schema;
+  auto_id: {
+    'type': 'integer',
+    'minimum': 0
   },
 
   varchar: (length) => {
@@ -17,6 +13,10 @@ const schemas = {
 
     if (length) schema.maxLength = length;
     return schema;
+  },
+
+  text: {
+    'type': 'string'
   },
 
   department: {
