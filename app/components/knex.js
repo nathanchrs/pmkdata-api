@@ -88,7 +88,7 @@ Object.getPrototypeOf(Knex.Client.prototype).pageAndSort = function (page, perPa
       sortDirection = 'desc';
     }
     if (!sortableFields || _.includes(sortableFields, sortField)) {
-      sortFields.push({ field: sortField, direction: sortDirection });
+      sortFields.push({ field: sortField, direction: sortDirection === 'desc' ? 'descending' : 'ascending' });
       query = query.orderBy(sortField, sortDirection);
     }
   }
@@ -111,7 +111,7 @@ Object.getPrototypeOf(Knex.Client.prototype).pageAndSort = function (page, perPa
         perPage: perPage,
         lastPage: Math.ceil(totalCount / perPage),
         totalCount: totalCount,
-        sortFields: sortFields
+        sort: sortFields
       };
     });
 };
