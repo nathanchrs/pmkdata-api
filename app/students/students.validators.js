@@ -29,7 +29,7 @@ const schemas = {
       'high_school': commonSchemas.varchar(255),
       'church': commonSchemas.varchar(255)
     },
-    'required': ['year', 'department', 'name', 'gender', 'birth_date', 'phone', 'parent_phone', 'line', 'current_address', 'hometown_address', 'high_school', 'church']
+    'required': ['year', 'department', 'name', 'gender', 'birth_date', 'phone', 'parent_phone', 'current_address', 'hometown_address', 'high_school', 'church']
   },
 
   updateStudent: {
