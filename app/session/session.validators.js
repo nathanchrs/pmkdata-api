@@ -10,7 +10,7 @@ const schemas = {
     'type': 'object',
     'properties': {
       'username': commonSchemas.username,
-      'password': commonSchemas.password
+      'password': commonSchemas.varchar(255)
     },
     'required': ['username', 'password']
   }
