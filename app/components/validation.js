@@ -9,7 +9,8 @@ const errors = require('http-errors');
 
 const ajv = new Ajv({
   coerceTypes: true,
-  removeAdditional: true
+  removeAdditional: true,
+  format: 'full' // Full mode for date-time validation, i.e. not only regex
 });
 
 module.exports = {
