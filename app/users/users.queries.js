@@ -26,10 +26,11 @@ const userSortableColumns = ['id', 'username', 'nim', 'email', 'role', 'status',
 
 module.exports = {
   listUsers: (search, page, perPage, sort) => {
-    return knex.select(userColumns)
+    return knex.select(userColumns.map(column => 'users.' + column + ' as ' + column).concat(['name']))
       .from('users')
-      .search(search, userSearchableColumns)
-      .pageAndSort(page, perPage, sort, userSortableColumns);
+      .leftJoin('students', 'users.nim', 'students.nim')
+      .search(search, userSearchableColumns.concat(['name']))
+      .pageAndSort(page, perPage, sort, userSortableColumns.concat(['name']));
   },
 
   createUser: (newUser) => {
