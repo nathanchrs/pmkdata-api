@@ -15,7 +15,7 @@ module.exports = {
   },
 
   listMentees: (userId) => {
-    return knex.select(menteeColumns.map(column => 'mentees.' + column + ' as ' + column).concat(['name', 'department', 'year']))
+    return knex.select(menteeColumns.map(column => 'mentees.' + column + ' as ' + column).concat(['name', 'nim', 'department', 'year', 'line', 'high_school', 'church']))
       .from('mentees')
       .where('user_id', userId)
       .leftJoin('students', 'mentees.student_id', 'students.id');
