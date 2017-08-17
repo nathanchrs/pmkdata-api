@@ -14,16 +14,16 @@ const interactionParticipantColumns = ['id', 'interaction_id', 'student_id', 'cr
 
 module.exports = {
   listInteractions: (search, page, perPage, sort, filterByMentorId) => {
-    let query = knex.select(interactionColumns).from('interactions');
+    let query = knex.select(interactionColumns.map(column => 'interactions.' + column + ' as ' + column)).from('interactions');
 
     if (filterByMentorId) {
-      query = query.leftJoin('interaction_mentors', 'interaction.id', 'interaction_mentors.interaction_id')
+      query = query.leftJoin('interaction_mentors', 'interactions.id', 'interaction_mentors.interaction_id')
         .where('interaction_mentors.user_id', filterByMentorId);
     }
 
     return query
-      .search(search, interactionSearchableColumns)
-      .pageAndSort(page, perPage, sort, interactionSortableColumns);
+      .search(search, interactionSearchableColumns.map(column => 'interactions.' + column))
+      .pageAndSort(page, perPage, sort, interactionSortableColumns.map(column => 'interactions.' + column));
   },
 
   createInteraction: (newInteraction) => {
@@ -52,12 +52,11 @@ module.exports = {
   },
 
   isInteractionMentor: (interactionId, userId) => {
-    knex.select('id')
+    return knex.count('id as count')
       .from('interaction_mentors')
       .where('interaction_id', interactionId)
       .andWhere('user_id', userId)
-      .first()
-      .then(interactionMentor => !!interactionMentor);
+      .then(result => result[0].count > 0);
   },
 
   listInteractionMentors: (interactionId) => {
