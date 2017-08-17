@@ -89,9 +89,10 @@ router.get('/interactions/:id/mentors', isInteractionMentorOrSupervisor, (req, r
 /**
  * Add a mentor for the given interaction.
  * @name Add interaction mentor
+ * WARNING: auth is supposed to be isInteractionMentorOrSupervisor, but changed to isLoggedIn to ease adding participants for new interactions.
  * @route {POST} /interactions/:id/mentors
  */
-router.post('/interactions/:id/mentors', isInteractionMentorOrSupervisor, validators.addInteractionMentor, (req, res, next) => {
+router.post('/interactions/:id/mentors', auth.middleware.isLoggedIn, validators.addInteractionMentor, (req, res, next) => {
   return queries.addInteractionMentor(req.params.id, req.body.user_id)
     .then(insertedInteractionMentor => res.status(201).json(insertedInteractionMentor))
     .catch(next);
@@ -121,10 +122,11 @@ router.get('/interactions/:id/participants', isInteractionMentorOrSupervisor, (r
 
 /**
  * Add a participant for the given interaction.
+ * WARNING: auth is supposed to be isInteractionMentorOrSupervisor, but changed to isLoggedIn to ease adding participants for new interactions.
  * @name Add interaction participant
  * @route {POST} /interactions/:id/participants
  */
-router.post('/interactions/:id/participants', isInteractionMentorOrSupervisor, validators.addInteractionParticipant, (req, res, next) => {
+router.post('/interactions/:id/participants', auth.middleware.isLoggedIn, validators.addInteractionParticipant, (req, res, next) => {
   return queries.addInteractionParticipant(req.params.id, req.body.student_id)
     .then(insertedInteractionParticipant => res.status(201).json(insertedInteractionParticipant))
     .catch(next);
