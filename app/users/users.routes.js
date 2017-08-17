@@ -28,6 +28,19 @@ router.get('/users', auth.middleware.isSupervisor, validators.listUsers, (req, r
 });
 
 /**
+ * Get a list of users for searching.
+ * @name Search users
+ * @route {GET} /users
+ */
+router.get('/users/search', auth.middleware.isLoggedIn, (req, res, next) => {
+  return queries.searchUsers(req.query.search)
+    .then((result) => {
+      return res.json(result);
+    })
+    .catch(next);
+});
+
+/**
  * Creates a new user.
  * @name Create user
  * @route {POST} /users

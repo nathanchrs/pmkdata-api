@@ -24,6 +24,19 @@ router.get('/students', auth.middleware.isSupervisor, validators.listStudents, (
 });
 
 /**
+ * Get a list of students for searching.
+ * @name Search students
+ * @route {GET} /students
+ */
+router.get('/students/search', auth.middleware.isLoggedIn, (req, res, next) => {
+  return queries.searchStudents(req.query.search)
+    .then((result) => {
+      return res.json(result);
+    })
+    .catch(next);
+});
+
+/**
  * Creates a new student. Can be accessed publicly if publicStudentRegistration config is true.
  * @name Create student
  * @route {POST} /students

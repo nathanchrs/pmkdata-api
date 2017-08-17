@@ -33,6 +33,14 @@ module.exports = {
       .pageAndSort(page, perPage, sort, userSortableColumns.map(column => 'users.' + column).concat(['name']));
   },
 
+  searchUsers: (search) => {
+    return knex.select(['users.id as id', 'users.username as username', 'name', 'department', 'year'])
+      .from('users')
+      .leftJoin('students', 'users.nim', 'students.nim')
+      .search(search, ['name', 'username'])
+      .limit(20);
+  },
+
   createUser: (newUser) => {
     let query = knex.select('username').from('users').where('username', newUser.username);
     if (newUser.nim) query = query.orWhere('nim', newUser.nim);

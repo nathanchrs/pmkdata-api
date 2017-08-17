@@ -31,6 +31,13 @@ module.exports = {
       .pageAndSort(page, perPage, sort, studentSortableColumns);
   },
 
+  searchStudents: (search) => {
+    return knex.select(['id', 'name', 'department', 'year'])
+      .from('students')
+      .search(search, ['name'])
+      .limit(20);
+  },
+
   createStudent: (newStudent) => {
     newStudent = _.pick(newStudent, studentAssignableColumns);
     newStudent.created_at = newStudent.updated_at = new Date();
