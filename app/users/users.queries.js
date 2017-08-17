@@ -29,8 +29,8 @@ module.exports = {
     return knex.select(userColumns.map(column => 'users.' + column + ' as ' + column).concat(['name']))
       .from('users')
       .leftJoin('students', 'users.nim', 'students.nim')
-      .search(search, userSearchableColumns.concat(['name']))
-      .pageAndSort(page, perPage, sort, userSortableColumns.concat(['name']));
+      .search(search, userSearchableColumns.map(column => 'users.' + column).concat(['name']))
+      .pageAndSort(page, perPage, sort, userSortableColumns.map(column => 'users.' + column).concat(['name']));
   },
 
   createUser: (newUser) => {

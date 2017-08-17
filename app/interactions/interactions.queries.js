@@ -28,6 +28,7 @@ module.exports = {
 
   createInteraction: (newInteraction) => {
     newInteraction = _.pick(newInteraction, interactionAssignableColumns);
+    if (newInteraction.time) newInteraction.time = new Date(newInteraction.time);
     newInteraction.created_at = newInteraction.updated_at = new Date();
     return knex('interactions').insert(newInteraction).then(insertedIds => Object.assign(newInteraction, { id: insertedIds[0] }));
   },
@@ -41,6 +42,7 @@ module.exports = {
 
   updateInteraction: (id, interactionUpdates) => {
     interactionUpdates = _.pick(interactionUpdates, interactionAssignableColumns);
+    if (interactionUpdates.time) interactionUpdates.time = new Date(interactionUpdates.time);
     interactionUpdates.updated_at = new Date();
     return knex('interactions').update(interactionUpdates).where('id', id);
   },
@@ -59,7 +61,7 @@ module.exports = {
   },
 
   listInteractionMentors: (interactionId) => {
-    return knex.select(interactionMentorColumns.concat(['username', 'name', 'department', 'year']))
+    return knex.select(interactionMentorColumns.map(column => 'interaction_mentors.' + column + ' as ' + column).concat(['username', 'name', 'department', 'year']))
       .from('interaction_mentors')
       .where('interaction_id', interactionId)
       .leftJoin('users', 'interaction_mentors.user_id', 'users.id')
@@ -67,7 +69,7 @@ module.exports = {
   },
 
   addInteractionMentor: (interactionId, userId) => {
-    let newInteractionMentor = { interaction_id: interactionId, mentor_id: userId };
+    let newInteractionMentor = { interaction_id: interactionId, user_id: userId };
     newInteractionMentor.created_at = newInteractionMentor.updated_at = new Date();
     return knex('interaction_mentors').insert(newInteractionMentor)
       .then(insertedIds => Object.assign(newInteractionMentor, { id: insertedIds[0] }));
@@ -80,7 +82,7 @@ module.exports = {
   },
 
   listInteractionParticipants: (interactionId) => {
-    return knex.select(interactionParticipantColumns.concat(['name', 'department', 'year']))
+    return knex.select(interactionParticipantColumns.map(column => 'interaction_participants.' + column + ' as ' + column).concat(['name', 'department', 'year']))
       .from('interaction_participants')
       .where('interaction_id', interactionId)
       .leftJoin('students', 'interaction_participants.student_id', 'students.id');
