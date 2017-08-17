@@ -86,7 +86,7 @@ module.exports = {
     if (userUpdates.password) {
       if (requireOldPasswordCheck) {
         promises = promises.then(() => {
-          return ensureOldPasswordIsCorrect(oldPassword);
+          return ensureOldPasswordIsCorrect(username, oldPassword);
         });
       }
 
