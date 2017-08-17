@@ -10,11 +10,11 @@ const BCRYPT_STRENGTH = 8;
 function ensureOldPasswordIsCorrect (username, password) {
   return knex.first('username', 'password').from('users').where('username', username)
     .then(function (user) {
-      if (!user) throw new errors.Unauthorized('Wrong username or password.');
+      if (!user) throw new errors.Forbidden('Wrong username or password.');
       return bcrypt.compare(password, user.password);
     })
     .then((result) => {
-      if (!result) throw new errors.Unauthorized('Wrong username or password.');
+      if (!result) throw new errors.Forbidden('Wrong username or password.');
       return Promise.resolve();
     });
 }
