@@ -41,6 +41,14 @@ module.exports = {
       .limit(20);
   },
 
+  searchUserMentees: (userId, search) => {
+    return knex.select(['students.id as id', 'name', 'department', 'year'])
+      .from('mentees')
+      .leftJoin('students', 'mentees.student_id', 'students.id')
+      .where('mentees.user_id', userId)
+      .search(search, ['name']);
+  },
+
   createUser: (newUser) => {
     let query = knex.select('username').from('users').where('username', newUser.username);
     if (newUser.nim) query = query.orWhere('nim', newUser.nim);

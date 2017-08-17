@@ -5,6 +5,7 @@ const auth = require('../components/auth.js');
 const validators = require('./users.validators.js');
 const errors = require('http-errors');
 const queries = require('./users.queries.js');
+const menteeQueries = require('../mentees/mentees.queries.js');
 const config = require('config');
 
 const router = express.Router();
@@ -77,6 +78,19 @@ router.get('/users/:username', isOwnerOrSupervisor, (req, res, next) => {
 });
 
 /**
+ * Search from a user's mentees.
+ * @name Search user mentees
+ * @route {GET} /users/:id/mentees/search
+ */
+router.get('/users/:id/mentees/search', auth.middleware.isLoggedIn, (req, res, next) => {
+  return queries.searchUserMentees(req.params.id, req.query.search)
+    .then((result) => {
+      return res.json(result);
+    })
+    .catch(next);
+});
+
+/**
  * Updates user information for the given username.
  * @name Update user
  * @route {PATCH} /users/:username
@@ -112,6 +126,19 @@ router.delete('/users/:username', auth.middleware.isSupervisor, (req, res, next)
   return queries.deleteUser(req.params.username)
     .then((affectedRowCount) => {
       return res.json({ affectedRowCount: affectedRowCount });
+    })
+    .catch(next);
+});
+
+/**
+ * Get a list of a mentor's mentees.
+ * @name Get user mentees
+ * @route {GET} /users/:id/mentees
+ */
+router.get('/users/:id/mentees', auth.middleware.isLoggedIn, (req, res, next) => {
+  return menteeQueries.listMentees(req.params.id)
+    .then((result) => {
+      return res.json(result);
     })
     .catch(next);
 });

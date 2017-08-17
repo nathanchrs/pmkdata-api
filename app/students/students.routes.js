@@ -5,6 +5,7 @@ const auth = require('../components/auth.js');
 const errors = require('http-errors');
 const _ = require('lodash');
 const queries = require('./students.queries');
+const menteeQueries = require('../mentees/mentees.queries');
 const validators = require('./students.validators');
 const config = require('config');
 
@@ -100,6 +101,19 @@ router.delete('/students/:id', auth.middleware.isSupervisor, (req, res, next) =>
   return queries.deleteStudent(req.params.id)
     .then((affectedRowCount) => {
       return res.json({ affectedRowCount: affectedRowCount });
+    })
+    .catch(next);
+});
+
+/**
+ * Get a list of a student's mentors
+ * @name Get student mentors
+ * @route {GET} /students/:id/mentors
+ */
+router.get('/students/:id/mentors', auth.middleware.isLoggedIn, (req, res, next) => {
+  return menteeQueries.listMentors(req.params.id)
+    .then((result) => {
+      return res.json(result);
     })
     .catch(next);
 });
