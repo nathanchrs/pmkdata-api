@@ -1,31 +1,19 @@
-FROM node:boron-alpine
+FROM node:carbon-alpine
 
 # Create app directory and set as working directory
-RUN mkdir -p /usr/src/pmkdata-api
-WORKDIR /usr/src/pmkdata-api
-
-# Use default node (non-root) user
-USER node
+RUN mkdir -p /opt/pmkdata-api
+WORKDIR /opt/pmkdata-api
 
 # Install app dependencies (done before copying app source to optimize caching)
-COPY package.json /usr/src/pmkdata-api/
-
-# Permission problem fix
-USER root
-RUN chown -R node:node /usr/src/pmkdata-api
-USER node
-
+COPY package.json /opt/pmkdata-api/
 RUN npm install --quiet
 
 # Copy app source to container
-COPY . /usr/src/pmkdata-api
+COPY . /opt/pmkdata-api
 
-# Permission problem fix
-USER root
-RUN chown -R node:node /usr/src/pmkdata-api
+# Use default node (non-root) user
+RUN chown -R node:node /opt/pmkdata-api
 USER node
 
 EXPOSE 3000
 CMD ["npm", "start"]
-
-

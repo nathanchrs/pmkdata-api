@@ -2,17 +2,13 @@
 
 version: '2.1'
 services:
+
   app:
     build: .
     command: 'node_modules/.bin/nodemon'
     depends_on:
       - mysql
       - redis
-    volumes: # TODO: use in-container files instead in production (?)
-      - .:/usr/src/pmkdata-api
-      - /usr/src/pmkdata-api/node_modules
-    ports:
-      - "3000:3000"
     environment:
       NODE_ENV: development # TODO: change this to 'production' on production
       PMKDATA_API_PORT: 3000
@@ -22,8 +18,14 @@ services:
       MYSQL_PASSWORD: "[ mysql_password ]" # TODO: change this to a strong password on production, must match with mysql
       MYSQL_DATABASE: pmkdata
       REDIS_HOST: redis
-      REDIS_PORT: 6379 # Using default redis image port
+      REDIS_PORT: 6379
+    ports:
+      - "3000:3000"
     restart: 'no' # TODO: change this to 'always' on production
+    volumes:
+      - .:/opt/pmkdata-api
+      - /opt/pmkdata-api/node_modules # Prevent mounting local node_modules
+
   mysql:
     image: "mysql"
     environment:
@@ -31,7 +33,14 @@ services:
       MYSQL_DATABASE: pmkdata
       MYSQL_USER: pmkdata
       MYSQL_PASSWORD: "[ mysql_password ]" # TODO: change this to a strong password on production, must match with app
-    restart: on-failure # TODO: change this to 'always' on production
+    restart: 'no' # TODO: change this to 'always' on production
+    volumes:
+      - mysql_data:/var/lib/mysql
+
   redis:
     image: "redis:alpine"
-    restart: on-failure # TODO: change this to 'always' on production
+    restart: 'no' # TODO: change this to 'always' on production
+
+volumes:
+  mysql_data:
+    driver: local
