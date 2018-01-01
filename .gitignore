@@ -7,6 +7,9 @@ docker-compose.production.yml
 # Sublime Text files
 *.sublime-*
 
+# Visual Studio Code files
+.vscode
+
 # jsDoc output
 docs
 

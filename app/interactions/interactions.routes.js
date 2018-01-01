@@ -1,6 +1,7 @@
 'use strict';
 
 const express = require('express');
+const _ = require('lodash');
 const auth = require('../components/auth.js');
 const errors = require('http-errors');
 const queries = require('./interactions.queries');
@@ -8,22 +9,23 @@ const validators = require('./interactions.validators');
 
 const router = express.Router();
 
-/** Custom auth middleware that checks whether the accessing user is a participating mentor for this interaction. */
-const isInteractionMentorOrSupervisor = auth.createMiddlewareFromPredicate((user, req) => {
-  if (auth.predicates.isSupervisor(user)) return true;
-  return queries.isInteractionMentor(req.params.id, req.user.id);
-});
+/**
+ * Check whether the current user is a participating mentor of this interaction.
+ */
+async function checkInteractionMentor(req) {
+  return queries.isInteractionMentor(req.params.id, req.user.username);
+}
 
 /**
- * Get a list of interactions.
- * @name Get interactions
+ * Get a list of all interactions.
+ * 'owner' access modifier will cause only interactions for the current user to be shown.
+ * @name List interactions
  * @route {GET} /interactions
  */
-router.get('/interactions', auth.middleware.isLoggedIn, validators.listInteractions, (req, res, next) => {
-  const filterByMentorId = auth.predicates.isSupervisor(req.user) ? false : req.user.id;
-  return queries.listInteractions(req.query.search, req.query.page, req.query.perPage, req.query.sort, filterByMentorId)
-    .then(result => res.json(result))
-    .catch(next);
+router.get('/interactions', auth.requirePrivilege('list-interactions', checkInteractionMentor), validators.listInteractions, async (req, res) => {
+  const filterByMentorUsername = _.includes(req.accessModifiers, auth.accessModifiers.ALL) ? false : req.user.username;
+  const result = await queries.listInteractions(req.query.search, req.query.page, req.query.perPage, req.query.sort, filterByMentorUsername);
+  return res.json(result);
 });
 
 /**
@@ -31,24 +33,20 @@ router.get('/interactions', auth.middleware.isLoggedIn, validators.listInteracti
  * @name Create interaction
  * @route {POST} /interactions
  */
-router.post('/interactions', auth.middleware.isLoggedIn, validators.createInteraction, (req, res, next) => {
-  return queries.createInteraction(req.body)
-    .then(insertedInteraction => res.status(201).json(insertedInteraction))
-    .catch(next);
+router.post('/interactions', auth.requirePrivilege('create-interaction'), validators.createInteraction, async (req, res) => {
+  const insertedInteraction = await queries.createInteraction(req.body);
+  return res.status(201).json(insertedInteraction);
 });
 
 /**
- * Get specific interaction information for the given id.
- * @name Get interaction info
+ * Get specific interaction information for the given ID.
+ * @name View interaction info
  * @route {GET} /interactions/:id
  */
-router.get('/interactions/:id', isInteractionMentorOrSupervisor, (req, res, next) => {
-  return queries.getInteraction(req.params.id)
-    .then((interaction) => {
-      if (!interaction) return next(new errors.NotFound('Interaction not found.'));
-      return res.json(interaction);
-    })
-    .catch(next);
+router.get('/interactions/:id', auth.requirePrivilege('view-interaction', checkInteractionMentor), async (req, res) => {
+  const interaction = await queries.getInteraction(req.params.id);
+  if (!interaction) throw new errors.NotFound('Interaction not found.');
+  return res.json(interaction);
 });
 
 /**
@@ -56,12 +54,9 @@ router.get('/interactions/:id', isInteractionMentorOrSupervisor, (req, res, next
  * @name Update interaction
  * @route {PATCH} /interactions/:id
  */
-router.patch('/interactions/:id', isInteractionMentorOrSupervisor, validators.updateInteraction, (req, res, next) => {
-  return queries.updateInteraction(req.params.id, req.body)
-    .then((affectedRowCount) => {
-      return res.json({ affectedRowCount: affectedRowCount });
-    })
-    .catch(next);
+router.patch('/interactions/:id', auth.requirePrivilege('update-interaction', checkInteractionMentor), validators.updateInteraction, async (req, res) => {
+  const affectedRowCount = await queries.updateInteraction(req.params.id, req.body);
+  return res.json({ affectedRowCount });
 });
 
 /**
@@ -69,78 +64,69 @@ router.patch('/interactions/:id', isInteractionMentorOrSupervisor, validators.up
  * @name Delete interaction
  * @route {DELETE} /interactions/:id
  */
-router.delete('/interactions/:id', isInteractionMentorOrSupervisor, (req, res, next) => {
-  return queries.deleteInteraction(req.params.id)
-    .then(affectedRowCount => res.json({ affectedRowCount: affectedRowCount }))
-    .catch(next);
+router.delete('/interactions/:id', auth.requirePrivilege('delete-interaction', checkInteractionMentor), async (req, res) => {
+  const affectedRowCount = await queries.deleteInteraction(req.params.id);
+  return res.json({ affectedRowCount });
 });
 
 /**
  * Get list of mentors for the given interaction.
- * @name Get interaction mentors
+ * @name List interaction mentors
  * @route {GET} /interactions/:id/mentors
  */
-router.get('/interactions/:id/mentors', isInteractionMentorOrSupervisor, (req, res, next) => {
-  return queries.listInteractionMentors(req.params.id)
-    .then(result => res.json(result))
-    .catch(next);
+router.get('/interactions/:id/mentors', auth.requirePrivilege('list-interaction-mentors', checkInteractionMentor), async (req, res) => {
+  const result = await queries.listInteractionMentors(req.params.id);
+  return res.json(result);
 });
 
 /**
  * Add a mentor for the given interaction.
- * @name Add interaction mentor
- * WARNING: auth is supposed to be isInteractionMentorOrSupervisor, but changed to isLoggedIn to ease adding participants for new interactions.
+ * @name Create interaction mentor
  * @route {POST} /interactions/:id/mentors
  */
-router.post('/interactions/:id/mentors', auth.middleware.isLoggedIn, validators.addInteractionMentor, (req, res, next) => {
-  return queries.addInteractionMentor(req.params.id, req.body.user_id)
-    .then(insertedInteractionMentor => res.status(201).json(insertedInteractionMentor))
-    .catch(next);
+router.post('/interactions/:id/mentors', auth.requirePrivilege('create-interaction-mentor', checkInteractionMentor), validators.addInteractionMentor, async (req, res) => {
+  const insertedInteractionMentor = await queries.addInteractionMentor(req.params.id, req.body.user_username);
+  return res.status(201).json(insertedInteractionMentor);
 });
 
 /**
  * Remove a mentor from the given interaction.
- * @name Remove interaction mentor
+ * @name Delete interaction mentor
  * @route {DELETE} /interactions/:id/mentors
  */
-router.delete('/interactions/:id/mentors/:userId', isInteractionMentorOrSupervisor, (req, res, next) => {
-  return queries.removeInteractionMentor(req.params.id, req.params.userId)
-    .then(affectedRowCount => res.json({ affectedRowCount: affectedRowCount }))
-    .catch(next);
+router.delete('/interactions/:id/mentors/:userUsername', auth.requirePrivilege('delete-interaction-mentor', checkInteractionMentor), async (req, res) => {
+  const affectedRowCount = await queries.removeInteractionMentor(req.params.id, req.params.userUsername);
+  return res.json({ affectedRowCount });
 });
 
 /**
  * Get list of participants for the given interaction ID.
- * @name Get interaction participants
+ * @name List interaction participants
  * @route {GET} /interactions/:id/participants
  */
-router.get('/interactions/:id/participants', isInteractionMentorOrSupervisor, (req, res, next) => {
-  return queries.listInteractionParticipants(req.params.id)
-    .then(result => res.json(result))
-    .catch(next);
+router.get('/interactions/:id/participants', auth.requirePrivilege('list-interaction-participants', checkInteractionMentor), async (req, res) => {
+  const result = await queries.listInteractionParticipants(req.params.id);
+  return result => res.json(result);
 });
 
 /**
  * Add a participant for the given interaction.
- * WARNING: auth is supposed to be isInteractionMentorOrSupervisor, but changed to isLoggedIn to ease adding participants for new interactions.
- * @name Add interaction participant
+ * @name Create interaction participant
  * @route {POST} /interactions/:id/participants
  */
-router.post('/interactions/:id/participants', auth.middleware.isLoggedIn, validators.addInteractionParticipant, (req, res, next) => {
-  return queries.addInteractionParticipant(req.params.id, req.body.student_id)
-    .then(insertedInteractionParticipant => res.status(201).json(insertedInteractionParticipant))
-    .catch(next);
+router.post('/interactions/:id/participants', auth.requirePrivilege('create-interaction-participant', checkInteractionMentor), validators.addInteractionParticipant, async (req, res) => {
+  const insertedInteractionParticipant = await queries.addInteractionParticipant(req.params.id, req.body.student_id);
+  return res.status(201).json(insertedInteractionParticipant);
 });
 
 /**
  * Remove a participant from the given interaction.
- * @name Remove interaction participant
+ * @name Delete interaction participant
  * @route {DELETE} /interactions/:id/participants
  */
-router.delete('/interactions/:id/participants/:studentId', isInteractionMentorOrSupervisor, (req, res, next) => {
-  return queries.removeInteractionParticipant(req.params.id, req.params.studentId)
-    .then(affectedRowCount => res.json({ affectedRowCount: affectedRowCount }))
-    .catch(next);
+router.delete('/interactions/:id/participants/:studentId', auth.requirePrivilege('delete-interaction-participant', checkInteractionMentor), async (req, res) => {
+  const affectedRowCount = await queries.removeInteractionParticipant(req.params.id, req.params.studentId);
+  return res.json({ affectedRowCount });
 });
 
 module.exports = router;

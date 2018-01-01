@@ -1,30 +1,31 @@
 'use strict';
 
 const express = require('express');
+const _ = require('lodash');
 const auth = require('../components/auth.js');
 const validators = require('./users.validators.js');
 const errors = require('http-errors');
 const queries = require('./users.queries.js');
 const config = require('config');
+const { userStatus } = require('../common/constants.js');
 
 const router = express.Router();
 
-/** Custom auth middleware that checks whether the accessing user is this user's owner or a supervisor. */
-const isOwnerOrSupervisor = auth.createMiddlewareFromPredicate((user, req) => {
-  return (user.username === req.params.username) || auth.predicates.isSupervisor(user);
-});
+/**
+ * Check whether the current user is accessing itself.
+ */
+function checkOwner(req) {
+  return req.user.username === req.params.username;
+}
 
 /**
  * Get a list of users.
  * @name Get users
  * @route {GET} /users
  */
-router.get('/users', auth.middleware.isSupervisor, validators.listUsers, (req, res, next) => {
-  return queries.listUsers(req.query.search, req.query.page, req.query.perPage, req.query.sort)
-    .then((result) => {
-      return res.json(result);
-    })
-    .catch(next);
+router.get('/users', auth.requirePrivilege('list-users'), validators.listUsers, async (req, res, next) => {
+  const result = await queries.listUsers(req.query.search, req.query.page, req.query.perPage, req.query.sort);
+  return res.json(result);
 });
 
 /**
@@ -32,75 +33,74 @@ router.get('/users', auth.middleware.isSupervisor, validators.listUsers, (req, r
  * @name Search users
  * @route {GET} /users
  */
-router.get('/users/search', auth.middleware.isLoggedIn, (req, res, next) => {
-  return queries.searchUsers(req.query.search)
-    .then((result) => {
-      return res.json(result);
-    })
-    .catch(next);
+router.get('/users/search', auth.requirePrivilege('search-users'), async (req, res, next) => {
+  const result = await queries.searchUsers(req.query.search);
+  return res.json(result);
 });
 
 /**
- * Creates a new user.
+ * Creates a new user (login required, for admins, etc.).
  * @name Create user
  * @route {POST} /users
  */
-router.post('/users', validators.createUser, (req, res, next) => { // TODO: email/captcha validation
+router.post('/users', auth.requirePrivilege('create-user'), validators.createUser, async (req, res, next) => {
+  const insertedUser = await queries.createUser(req.body);
+  // TODO: add default role for the new user in the 'user_roles' table.
+  return res.status(201).json(insertedUser);
+});
+
+/**
+ * Public (no login required) endpoint for creating a new user (for registration, etc.).
+ * Sets the new user's status to 'awaiting_validation'.
+ * Can be accessed if publicUserRegistration config is true.
+ * TODO: email/captcha validation
+ * @name Public user registration
+ * @route {POST} /users/public
+ */
+router.post('/users/public', validators.createUser, async (req, res, next) => {
   const publicUserRegistration = config.get('publicUserRegistration');
-  const isSupervisor = auth.predicates.isSupervisor(req.user);
-  if (!isSupervisor && !publicUserRegistration) return next(new errors.Forbidden());
+  if (!publicUserRegistration) throw new errors.Forbidden('Public user registration is not available at the moment.');
 
-  if (!isSupervisor) {
-    req.body.role = 'user';
-    req.body.status = 'awaiting_validation';
-  }
-
-  return queries.createUser(req.body)
-    .then((insertedUser) => {
-      return res.status(201).json(insertedUser);
-    })
-    .catch(next);
+  req.body.status = userStatus.AWAITING_VALIDATION;
+  const insertedUser = await queries.createUser(req.body);
+  return res.status(201).json(insertedUser);
 });
 
 /**
  * Get specific user information for the specified username.
- * @name Get user info.
+ * @name View user
  * @route {GET} /users/:username
  */
-router.get('/users/:username', isOwnerOrSupervisor, (req, res, next) => {
-  return queries.getUser(req.params.username)
-    .then((user) => {
-      if (!user) return next(new errors.NotFound('User not found.'));
-      return res.json(user);
-    })
-    .catch(next);
+router.get('/users/:username', auth.requirePrivilege('view-user', checkOwner), async (req, res, next) => {
+  const user = await queries.getUser(req.params.username);
+  if (!user) throw new errors.NotFound('User not found.');
+  return res.json(user);
 });
 
 /**
  * Updates user information for the given username.
+ * TODO: verify status update to prevent locking out oneself.
  * @name Update user
  * @route {PATCH} /users/:username
  */
-router.patch('/users/:username', isOwnerOrSupervisor, validators.updateUser, (req, res, next) => {
-  let userUpdates = {
-    email: req.body.email,
-    password: req.body.newPassword
-  };
+router.patch('/users/:username', auth.requirePrivilege('update-user', checkOwner), validators.updateUser, async (req, res, next) => {
+  const affectedRowCount = await queries.updateUser(req.params.username, req.body);
+  return res.json({ affectedRowCount });
+});
 
-  // Supervisor can update all and don't need old password check for password changes, owner can't update status, role, NIM
-  let requireOldPasswordCheck = true;
-  if (auth.predicates.isSupervisor(req.user)) {
-    userUpdates.nim = req.body.nim;
-    userUpdates.status = req.body.status;
-    userUpdates.role = req.body.role;
-    requireOldPasswordCheck = false;
+/**
+ * Updates user password for the given username.
+ * If 'all' access modifier is not set, requires old password to be supplied.
+ * @name Update user password
+ * @route {PATCH} /users/:username/password
+ */
+router.patch('/users/:username/password', auth.requirePrivilege('update-user-password', checkOwner), validators.updateUserPassword, async (req, res, next) => {
+  if (_.includes(req.accessModifiers, auth.accessModifiers.ALL)) {
+    const affectedRowCount = await queries.updateUserPassword(req.params.username, req.body.newPassword, false);
+  } else {
+    const affectedRowCount = await queries.updateUserPassword(req.params.username, req.body.newPassword, true, req.body.oldPassword);
   }
-
-  return queries.updateUser(req.params.username, userUpdates, requireOldPasswordCheck, req.body.oldPassword)
-    .then((affectedRowCount) => {
-      return res.json({ affectedRowCount: affectedRowCount });
-    })
-    .catch(next);
+  return res.json({ affectedRowCount });
 });
 
 /**
@@ -108,12 +108,9 @@ router.patch('/users/:username', isOwnerOrSupervisor, validators.updateUser, (re
  * @name Delete user
  * @route {DELETE} /users/:username
  */
-router.delete('/users/:username', auth.middleware.isSupervisor, (req, res, next) => {
-  return queries.deleteUser(req.params.username)
-    .then((affectedRowCount) => {
-      return res.json({ affectedRowCount: affectedRowCount });
-    })
-    .catch(next);
+router.delete('/users/:username', auth.requirePrivilege('delete-user', checkOwner), async (req, res, next) => {
+  const affectedRowCount = await queries.deleteUser(req.params.username)
+  return res.json({ affectedRowCount });
 });
 
 module.exports = router;

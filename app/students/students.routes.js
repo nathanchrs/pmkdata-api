@@ -3,7 +3,6 @@
 const express = require('express');
 const auth = require('../components/auth.js');
 const errors = require('http-errors');
-const _ = require('lodash');
 const queries = require('./students.queries');
 const validators = require('./students.validators');
 const config = require('config');
@@ -11,16 +10,29 @@ const config = require('config');
 const router = express.Router();
 
 /**
+ * Load a student specified in the URL parameter id to req.object.
+ */
+async function loadStudent (req, res, next) {
+  req.object = await queries.getStudent(req.params.id);
+  if (!req.object) throw new errors.NotFound('Student not found.');
+  return next();
+}
+
+/**
+ * Check whether the current user is the owner of req.object.
+ */
+function checkOwner (req) {
+  return req.user.nim === req.object.nim;
+}
+
+/**
  * Get a list of students.
- * @name Get students
+ * @name List students
  * @route {GET} /students
  */
-router.get('/students', auth.middleware.isSupervisor, validators.listStudents, (req, res, next) => {
-  return queries.listStudents(req.query.search, req.query.page, req.query.perPage, req.query.sort)
-    .then((result) => {
-      return res.json(result);
-    })
-    .catch(next);
+router.get('/students', auth.requirePrivilege('list-students'), validators.listStudents, async (req, res, next) => {
+  const result = await queries.listStudents(req.query.search, req.query.page, req.query.perPage, req.query.sort);
+  return res.json(result);
 });
 
 /**
@@ -28,54 +40,49 @@ router.get('/students', auth.middleware.isSupervisor, validators.listStudents, (
  * @name Search students
  * @route {GET} /students
  */
-router.get('/students/search', auth.middleware.isLoggedIn, (req, res, next) => {
-  return queries.searchStudents(req.query.search)
-    .then((result) => {
-      return res.json(result);
-    })
-    .catch(next);
+router.get('/students/search', auth.requirePrivilege('search-students'), async (req, res, next) => {
+  const result = await queries.searchStudents(req.query.search);
+  return res.json(result);
 });
 
 /**
- * Creates a new student. Can be accessed publicly if publicStudentRegistration config is true.
+ * Creates a new student (login required, for admins, etc.).
+ * Sets NIM to be equal to TPB NIM if NIM is empty.
  * @name Create student
  * @route {POST} /students
  */
-router.post('/students', validators.createStudent, (req, res, next) => {
+router.post('/students', auth.requirePrivilege('create-student'), validators.createStudent, async (req, res, next) => {
+  if (req.body.tpb_nim && !req.body.nim) req.body.nim = req.body.tpb_nim;
+
+  const insertedStudent = await queries.createStudent(req.body);
+  return res.status(201).json(insertedStudent);
+});
+
+/**
+ * Public (no login required) endpoint for creating a new student (for registration forms, etc.).
+ * Sets the student's year to the current year, prevents non-TPB NIM from being set.
+ * Can be accessed if publicStudentRegistration config is true.
+ * @name Public student registration
+ * @route {POST} /students/public
+ */
+router.post('/students/public', validators.publicStudentRegistration, async (req, res, next) => {
   const publicStudentRegistration = config.get('publicStudentRegistration');
-  const isSupervisor = auth.predicates.isSupervisor(req.user);
+  if (!publicStudentRegistration) throw new errors.Forbidden('Public student registration is not available at the moment.');
 
-  if (!isSupervisor && !publicStudentRegistration) return next(new errors.Forbidden());
+  req.body.year = (new Date()).getFullYear();
+  if (req.body.tpb_nim && !req.body.nim) req.body.nim = req.body.tpb_nim;
 
-  let editableColumns = ['tpb_nim', 'department', 'name', 'gender', 'birth_date', 'phone', 'parent_phone', 'line', 'current_address', 'hometown_address', 'high_school', 'church'];
-  if (isSupervisor) {
-    editableColumns = editableColumns.concat(['nim', 'year']);
-  } else if (publicStudentRegistration) {
-    req.body.year = (new Date()).getFullYear();
-  }
-  let newStudent = _.pick(req.body, editableColumns);
-
-  if (newStudent.tpb_nim && !newStudent.nim) newStudent.nim = newStudent.tpb_nim;
-
-  return queries.createStudent(newStudent)
-    .then((insertedStudent) => {
-      return res.status(201).json(insertedStudent);
-    })
-    .catch(next);
+  const insertedStudent = await queries.createStudent(req.body);
+  return res.status(201).json(insertedStudent);
 });
 
 /**
  * Get specific student information for the given id.
- * @name Get student info
+ * @name View student
  * @route {GET} /students/:id
  */
-router.get('/students/:id', auth.middleware.isSupervisor, (req, res, next) => {
-  return queries.getStudent(req.params.id)
-    .then((student) => {
-      if (!student) return next(new errors.NotFound('Student not found.'));
-      return res.json(student);
-    })
-    .catch(next);
+router.get('/students/:id', loadStudent, auth.requirePrivilege('view-student', checkOwner), async (req, res, next) => {
+  return res.json(req.object);
 });
 
 /**
@@ -83,12 +90,9 @@ router.get('/students/:id', auth.middleware.isSupervisor, (req, res, next) => {
  * @name Update student
  * @route {PATCH} /students/:id
  */
-router.patch('/students/:id', auth.middleware.isSupervisor, validators.updateStudent, (req, res, next) => {
-  return queries.updateStudent(req.params.id, req.body)
-    .then((affectedRowCount) => {
-      return res.json({ affectedRowCount: affectedRowCount });
-    })
-    .catch(next);
+router.patch('/students/:id', loadStudent, auth.requirePrivilege('update-student', checkOwner), validators.updateStudent, async (req, res, next) => {
+  const affectedRowCount = await queries.updateStudent(req.params.id, req.body);
+  return res.json({ affectedRowCount });
 });
 
 /**
@@ -96,12 +100,9 @@ router.patch('/students/:id', auth.middleware.isSupervisor, validators.updateStu
  * @name Delete student
  * @route {DELETE} /students/:id
  */
-router.delete('/students/:id', auth.middleware.isSupervisor, (req, res, next) => {
-  return queries.deleteStudent(req.params.id)
-    .then((affectedRowCount) => {
-      return res.json({ affectedRowCount: affectedRowCount });
-    })
-    .catch(next);
+router.delete('/students/:id', loadStudent, auth.requirePrivilege('delete-student', checkOwner), async (req, res, next) => {
+  const affectedRowCount = await queries.deleteStudent(req.params.id);
+  return res.json({ affectedRowCount });
 });
 
 module.exports = router;

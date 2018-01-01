@@ -1,28 +1,24 @@
 'use strict';
 
-var knex = require('../components/knex.js');
+const knex = require('../components/knex.js');
 const errors = require('http-errors');
 const bcrypt = require('bcryptjs');
 const _ = require('lodash');
 
 const BCRYPT_STRENGTH = 8;
 
-function ensureOldPasswordIsCorrect (username, password) {
-  return knex.first('username', 'password').from('users').where('username', username)
-    .then(function (user) {
-      if (!user) throw new errors.Unauthorized('Wrong username or password.');
-      return bcrypt.compare(password, user.password);
-    })
-    .then((result) => {
-      if (!result) throw new errors.Unauthorized('Wrong username or password.');
-      return Promise.resolve();
-    });
+async function checkOldPassword (username, password) {
+  const user = await knex.first('username', 'password').from('users').where('username', username);
+  if (!user) return false;
+
+  const passwordMatches = await bcrypt.compare(password, user.password);
+  return passwordMatches;
 }
 
-const userColumns = ['id', 'username', 'nim', 'email', 'password', 'role', 'status', 'created_at', 'updated_at'];
-const userAssignableColumns = ['username', 'nim', 'email', 'password', 'role', 'status'];
-const userSearchableColumns = ['id', 'username', 'nim', 'email'];
-const userSortableColumns = ['id', 'username', 'nim', 'email', 'role', 'status', 'created_at', 'updated_at'];
+const userColumns = ['username', 'nim', 'email', 'password', 'status', 'created_at', 'updated_at'];
+const userAssignableColumns = ['username', 'nim', 'email', 'status'];
+const userSearchableColumns = ['username', 'nim', 'email'];
+const userSortableColumns = ['username', 'nim', 'email', 'status', 'created_at', 'updated_at'];
 
 module.exports = {
   listUsers: (search, page, perPage, sort) => {
@@ -34,7 +30,7 @@ module.exports = {
   },
 
   searchUsers: (search) => {
-    return knex.select(['users.id as id', 'users.username as username', 'name', 'department', 'year'])
+    return knex.select(['users.username as username', 'name', 'department', 'year'])
       .from('users')
       .leftJoin('students', 'users.nim', 'students.nim')
       .search(search, ['name', 'username'])
@@ -61,7 +57,7 @@ module.exports = {
       })
       .then((hash) => {
         newUser.password = hash;
-        return knex('users').insert(newUser).then(insertedIds => Object.assign(newUser, { id: insertedIds[0], password: '' }));
+        return knex('users').insert(newUser).then(insertedUsernames => Object.assign(newUser, { password: '' }));
       });
   },
 
@@ -72,29 +68,21 @@ module.exports = {
       .first();
   },
 
-  updateUser: (username, userUpdates, requireOldPasswordCheck = true, oldPassword = '') => {
-    let promises = Promise.resolve();
-
-    if (userUpdates.password) {
-      if (requireOldPasswordCheck) {
-        promises = promises.then(() => {
-          return ensureOldPasswordIsCorrect(oldPassword);
-        });
-      }
-
-      promises = promises.then(() => {
-        return bcrypt.hash(userUpdates.password, BCRYPT_STRENGTH);
-      });
-    }
-
+  updateUser: async (username, userUpdates) => {
     userUpdates = _.pick(userUpdates, userAssignableColumns);
     userUpdates.updated_at = new Date();
+    return knex('users').update(userUpdates).where('username', username);
+  },
 
-    return promises
-      .then((hash) => {
-        userUpdates.password = hash; // If hash is not computed, will result in undefined, which will be ignored.
-        return knex('users').update(userUpdates).where('username', username);
-      });
+  updateUserPassword: async (username, newPassword, requireOldPasswordCheck, oldPassword) => {
+    if (requireOldPasswordCheck && !(await checkPassword(username, oldPassword))) {
+      throw new errors.Unauthorized('Wrong username or password.');
+    }
+
+    const hash = await bcrypt.hash(newPassword, BCRYPT_STRENGTH);
+    return knex('users')
+      .update({ password: hash, updated_at: new Date() })
+      .where('username', username);
   },
 
   deleteUser: (username) => {

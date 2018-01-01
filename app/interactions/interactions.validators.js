@@ -35,9 +35,9 @@ const schemas = {
   addInteractionMentor: {
     'type': 'object',
     'properties': {
-      'user_id': commonSchemas.auto_id
+      'user_username': commonSchemas.varchar(255)
     },
-    'required': ['user_id']
+    'required': ['user_username']
   },
 
   addInteractionParticipant: {

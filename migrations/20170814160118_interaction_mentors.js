@@ -2,13 +2,13 @@
 exports.up = (knex, Promise) => {
   return Promise.all([
     knex.schema.createTable('interaction_mentors', table => {
-      table.increments('id').primary();
       table.integer('interaction_id').unsigned().notNullable();
-      table.integer('user_id').unsigned().notNullable();
+      table.string('user_username').notNullable();
       table.timestamps();
 
+      table.primary(['interaction_id', 'user_username']);
       // table.foreign('interaction_id').references('interactions.id').onDelete('RESTRICT');
-      // table.foreign('user_id').references('users.id').onDelete('RESTRICT');
+      // table.foreign('user_username').references('users.username').onDelete('RESTRICT');
     })
   ]);
 };

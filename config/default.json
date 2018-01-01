@@ -28,9 +28,9 @@
       "timestamp": true
     }
   },
+  
+  "routePrefix": "/api",
 
   "publicUserRegistration": true,
-  "publicStudentRegistration": true,
-  
-  "routePrefix": "/api"
+  "publicStudentRegistration": true
 }

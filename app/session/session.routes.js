@@ -13,10 +13,10 @@ const router = express.Router();
 
 /**
  * Get the current session information (currently only the current user).
- * @name Get current session
+ * @name View current session
  * @route {GET} /session
  */
-router.get('/session', auth.middleware.isLoggedIn, (req, res) => {
+router.get('/session', auth.isLoggedIn, async (req, res) => {
   return res.json(req.user);
 });
 
@@ -27,12 +27,15 @@ router.get('/session', auth.middleware.isLoggedIn, (req, res) => {
  * @bodyparam password {string} The password entered.
  * @return {object} The current user information if login is successful, HTTP 401 otherwise.
  */
-router.post('/session', validators.createSession, passport.authenticate('local'), (req, res) => {
+router.post('/session', validators.createSession, passport.authenticate('local'), async (req, res) => {
   return res.json(req.user);
 });
 
-/* Logout */
-router.delete('/session', (req, res) => {
+/**
+ * @name Delete current session (logout)
+ * @route {DELETE} /session
+ */
+router.delete('/session', async (req, res) => {
   req.logout();
   return res.json({ 'message': 'Logged out successfully.' });
 });

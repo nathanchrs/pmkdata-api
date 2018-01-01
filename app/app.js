@@ -14,6 +14,7 @@ const listFiles = require('fs-readdir-recursive');
 const path = require('path');
 const config = require('config');
 const express = require('express');
+require('express-async-errors'); // Patch to support async/await error handling in Express
 const errorHandler = require('api-error-handler');
 
 /* Create app and logger */
@@ -33,6 +34,7 @@ const bodyParser = require('body-parser');
 const methodOverride = require('method-override');
 const session = require('./components/session.js');
 const passport = require('./components/passport.js');
+const auth = require('./components/auth.js');
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -52,7 +54,7 @@ listFiles(routeDirectory).filter(file => file.endsWith('.routes.js')).forEach((f
   if (!router.baseRoute) router.baseRoute = '/';
   const completeRoute = config.get('routePrefix') + router.baseRoute;
 
-  winston.log('verbose', 'Using route %s...', completeRoute);
+  winston.log('verbose', 'Using route %s: %s...', file, completeRoute);
   app.use(completeRoute, router);
 });
 

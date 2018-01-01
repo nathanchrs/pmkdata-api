@@ -1,7 +1,6 @@
 'use strict';
 
-var knex = require('../components/knex.js');
-
+const knex = require('../components/knex.js');
 const _ = require('lodash');
 
 const interactionColumns = ['id', 'time', 'title', 'notes', 'tags', 'created_at', 'updated_at'];
@@ -9,16 +8,16 @@ const interactionAssignableColumns = ['time', 'title', 'notes', 'tags'];
 const interactionSearchableColumns = ['id', 'time', 'title', 'notes', 'tags'];
 const interactionSortableColumns = ['id', 'time', 'title', 'tags', 'created_at', 'updated_at'];
 
-const interactionMentorColumns = ['id', 'interaction_id', 'user_id', 'created_at', 'updated_at'];
-const interactionParticipantColumns = ['id', 'interaction_id', 'student_id', 'created_at', 'updated_at'];
+const interactionMentorColumns = ['interaction_id', 'user_username', 'created_at', 'updated_at'];
+const interactionParticipantColumns = ['interaction_id', 'student_id', 'created_at', 'updated_at'];
 
 module.exports = {
-  listInteractions: (search, page, perPage, sort, filterByMentorId) => {
+  listInteractions: (search, page, perPage, sort, filterByMentorUsername) => {
     let query = knex.select(interactionColumns.map(column => 'interactions.' + column + ' as ' + column)).from('interactions');
 
-    if (filterByMentorId) {
+    if (filterByMentorUsername) {
       query = query.leftJoin('interaction_mentors', 'interactions.id', 'interaction_mentors.interaction_id')
-        .where('interaction_mentors.user_id', filterByMentorId);
+        .where('interaction_mentors.user_username', filterByMentorUsername);
     }
 
     return query
@@ -30,13 +29,14 @@ module.exports = {
     newInteraction = _.pick(newInteraction, interactionAssignableColumns);
     if (newInteraction.time) newInteraction.time = new Date(newInteraction.time);
     newInteraction.created_at = newInteraction.updated_at = new Date();
+    // TODO: check returned inserted ID format for compound primary key
     return knex('interactions').insert(newInteraction).then(insertedIds => Object.assign(newInteraction, { id: insertedIds[0] }));
   },
 
-  getInteraction: (id, filterByMentorId) => {
+  getInteraction: id => {
     return knex.select(interactionColumns)
       .from('interactions')
-      .where('interactions.id', id)
+      .where('id', id)
       .first();
   },
 
@@ -47,37 +47,38 @@ module.exports = {
     return knex('interactions').update(interactionUpdates).where('id', id);
   },
 
-  deleteInteraction: (id) => {
+  deleteInteraction: id => {
     return knex('interactions').delete().where('id', id);
   },
 
-  isInteractionMentor: (interactionId, userId) => {
+  isInteractionMentor: (interactionId, userUsername) => {
     return knex.count('id as count')
       .from('interaction_mentors')
       .where('interaction_id', interactionId)
-      .andWhere('user_id', userId)
+      .andWhere('user_username', userUsername)
+      .limit(1)
       .then(result => result[0].count > 0);
   },
 
-  listInteractionMentors: (interactionId) => {
+  listInteractionMentors: interactionId => {
     return knex.select(interactionMentorColumns.map(column => 'interaction_mentors.' + column + ' as ' + column).concat(['username', 'name', 'department', 'year']))
       .from('interaction_mentors')
       .where('interaction_id', interactionId)
-      .leftJoin('users', 'interaction_mentors.user_id', 'users.id')
+      .leftJoin('users', 'interaction_mentors.user_username', 'users.username')
       .leftJoin('students', 'users.nim', 'students.nim');
   },
 
-  addInteractionMentor: (interactionId, userId) => {
-    let newInteractionMentor = { interaction_id: interactionId, user_id: userId };
+  addInteractionMentor: (interactionId, userUsername) => {
+    let newInteractionMentor = { interaction_id: interactionId, user_username: userUsername };
     newInteractionMentor.created_at = newInteractionMentor.updated_at = new Date();
     return knex('interaction_mentors').insert(newInteractionMentor)
       .then(insertedIds => Object.assign(newInteractionMentor, { id: insertedIds[0] }));
   },
 
-  removeInteractionMentor: (interactionId, userId) => {
+  removeInteractionMentor: (interactionId, userUsername) => {
     return knex('interaction_mentors').delete()
       .where('interaction_id', interactionId)
-      .andWhere('user_id', userId);
+      .andWhere('user_username', userUsername);
   },
 
   listInteractionParticipants: (interactionId) => {

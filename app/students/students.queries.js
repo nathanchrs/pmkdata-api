@@ -1,6 +1,6 @@
 'use strict';
 
-var knex = require('../components/knex.js');
+const knex = require('../components/knex.js');
 const _ = require('lodash');
 
 const studentColumns = [

@@ -5,7 +5,7 @@ services:
 
   app:
     build: .
-    command: 'node_modules/.bin/nodemon'
+    command: 'npm run dev' # TODO: change this to 'npm start' on production or remove this line
     depends_on:
       - mysql
       - redis
@@ -21,10 +21,11 @@ services:
       REDIS_PORT: 6379
     ports:
       - "3000:3000"
+      - "9229:9229" # Node Inspector port for debugging, TODO: remove on production
     restart: 'no' # TODO: change this to 'always' on production
     volumes:
       - .:/opt/pmkdata-api
-      - /opt/pmkdata-api/node_modules # Prevent mounting local node_modules
+      - /opt/pmkdata-api/node_modules/ # Prevent mounting local node_modules (note: trailing slash matters)
 
   mysql:
     image: "mysql"

@@ -17,7 +17,6 @@ const schemas = {
       'username': commonSchemas.username,
       'password': commonSchemas.password,
       'status': commonSchemas.userStatus,
-      'role': commonSchemas.role,
       'nim': commonSchemas.nim,
       'email': commonSchemas.email
     },
@@ -27,14 +26,19 @@ const schemas = {
   updateUser: {
     'type': 'object',
     'properties': {
-      'username': commonSchemas.username,
       'nim': commonSchemas.nim,
       'email': commonSchemas.email,
-      'status': commonSchemas.userStatus,
-      'role': commonSchemas.role,
+      'status': commonSchemas.userStatus
+    }
+  },
+
+  updateUserPassword: {
+    'type': 'object',
+    'properties': {
       'oldPassword': commonSchemas.password,
       'newPassword': commonSchemas.password
-    }
+    },
+    'required': ['newPassword']
   }
 
 };

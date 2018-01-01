@@ -1,5 +1,7 @@
 'use strict';
 
+const constants = require('./constants.js');
+
 const schemas = {
   auto_id: {
     'type': 'integer',
@@ -42,7 +44,7 @@ const schemas = {
 
   gender: {
     'type': 'string',
-    'enum': ['male', 'female']
+    'enum': [constants.gender.MALE, constants.gender.FEMALE]
   },
 
   phone: {
@@ -80,14 +82,9 @@ const schemas = {
     'maxLength': 255
   },
 
-  role: {
-    'type': 'string',
-    'enum': ['admin', 'supervisor', 'user']
-  },
-
   userStatus: {
     'type': 'string',
-    'enum': ['active', 'awaiting_validation', 'disabled']
+    'enum': [constants.userStatus.ACTIVE, constants.userStatus.AWAITING_VALIDATION, constants.userStatus.DISABLED]
   },
 
   pagingAndSortingProperties: {
