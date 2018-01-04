@@ -20,6 +20,7 @@ const winston = require('./winston.js');
 
 const privilegeDelimiter = ':';
 const accessModifiers = { ALL: 'all', OWNER: 'owner' };
+let availablePrivileges = {};
 
 const getUserPrivileges = async user => {
   try {
@@ -38,12 +39,17 @@ const getUserPrivileges = async user => {
  * If the current user (req.user) is not found or has no matching privilege, a HTTP Unauthorized (401) error is thrown.
  * Requires req.user.privileges to be loaded with an array of privileges of the current user.
  * Sets req.accessModifiers with a string array containing matching access modifiers (empty access modifier will be recorded as 'all').
+ * Saves registered operation and access modifiers in availablePrivileges.
  * @param operation {string} The operation name required by the current operation.
  * @param checkOwner {function} async (req) => Boolean: whether the current user should be able to do the operation in this request.
  *  If this function is not specified, the owner check won't be executed.
  * @returns An Express middleware that checks the given privilege.
  */
 const requirePrivilege = (operation, checkOwner) => {
+  let supportsOwner = _.isFunction(checkOwner);
+  let allSupportsOwner = (availablePrivileges[operation] && availablePrivileges[operation].owner) || supportsOwner;
+  availablePrivileges[operation] = { all: true, owner: allSupportsOwner };
+
   return async (req, res, next) => {
     if (!req.user) throw new errors.Unauthorized(`Not logged in, can't access operation ${operation}.`);
     const userPrivileges = await getUserPrivileges(req.user);
@@ -56,7 +62,7 @@ const requirePrivilege = (operation, checkOwner) => {
       if (matchingUserPrivileges[i] === operation) {
         req.accessModifiers.push(accessModifiers.ALL);
       } else if (matchingUserPrivileges[i] === operation + privilegeDelimiter + accessModifiers.OWNER) {
-        if (_.isFunction(checkOwner)) {
+        if (supportsOwner) {
           if (await checkOwner(req)) {
             req.accessModifiers.push(accessModifiers.OWNER);
           }
@@ -83,4 +89,4 @@ const isLoggedIn = (req, res, next) => {
   return next();
 };
 
-module.exports = { accessModifiers, getUserPrivileges, requirePrivilege, isLoggedIn };
+module.exports = { accessModifiers, availablePrivileges, getUserPrivileges, requirePrivilege, isLoggedIn };

@@ -29,6 +29,18 @@ describe('Auth', function () {
   });
 
   describe('requirePrivilege middleware', function () {
+    it('should register privileges in availablePrivileges', async function () {
+      const middleware = auth.requirePrivilege('operation-name');
+      expect(auth.availablePrivileges['operation-name']).to.deep.equal({ all: true, owner: false });
+
+      const middleware2 = auth.requirePrivilege('operation-name-2', () => {});
+      expect(auth.availablePrivileges['operation-name-2']).to.deep.equal({ all: true, owner: true });
+
+      // Owner must also be true in the following case since there is an operation-name-2 registered with owner: true already
+      const middleware3 = auth.requirePrivilege('operation-name-2');
+      expect(auth.availablePrivileges['operation-name-2']).to.deep.equal({ all: true, owner: true });
+    });
+
     it('should throw HTTP Unauthorized if user is not logged in', async function () {
       const middleware = auth.requirePrivilege('public-operation-name');
       const nextSpy = sinon.spy();
