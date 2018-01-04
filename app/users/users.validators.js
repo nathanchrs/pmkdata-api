@@ -39,6 +39,14 @@ const schemas = {
       'newPassword': commonSchemas.password
     },
     'required': ['newPassword']
+  },
+
+  addUserRole: {
+    'type': 'object',
+    'properties': {
+      'role': commonSchemas.role
+    },
+    'required': ['role']
   }
 
 };

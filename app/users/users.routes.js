@@ -20,7 +20,7 @@ function checkOwner (req) {
 
 /**
  * Get a list of users.
- * @name Get users
+ * @name List users
  * @route {GET} /users
  */
 router.get('/users', auth.requirePrivilege('list-users'), validators.listUsers, async (req, res, next) => {
@@ -31,7 +31,7 @@ router.get('/users', auth.requirePrivilege('list-users'), validators.listUsers, 
 /**
  * Get a list of users for searching.
  * @name Search users
- * @route {GET} /users
+ * @route {GET} /users/search
  */
 router.get('/users/search', auth.requirePrivilege('search-users'), async (req, res, next) => {
   const result = await queries.searchUsers(req.query.search);
@@ -129,7 +129,7 @@ router.get('/users/:username/roles', auth.requirePrivilege('list-user-roles', ch
  * @name Create user role
  * @route {POST} /users/:username/roles
  */
-router.post('/users/:username/roles', auth.requirePrivilege('create-user-role', checkOwner), async (req, res, next) => {
+router.post('/users/:username/roles', auth.requirePrivilege('create-user-role', checkOwner), validators.addUserRole, async (req, res, next) => {
   const insertedUserRole = await queries.addUserRole(req.params.username, req.body.role);
   return res.status(201).json(insertedUserRole);
 });

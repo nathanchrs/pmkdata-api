@@ -99,9 +99,7 @@ module.exports = {
   },
 
   addUserRole: (username, role) => {
-    let newUserRole = { username, role, created_at: new Date() };
-    return knex('user_roles').insert(newUserRole)
-      .then(insertedIds => Object.assign(newUserRole, { id: insertedIds[0] }));
+    return knex('user_roles').insert({ username, role, created_at: new Date() });
   },
 
   removeUserRole: (username, role) => {
