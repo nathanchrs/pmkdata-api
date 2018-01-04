@@ -8,8 +8,8 @@ const interactionAssignableColumns = ['time', 'title', 'notes', 'tags'];
 const interactionSearchableColumns = ['id', 'time', 'title', 'notes', 'tags'];
 const interactionSortableColumns = ['id', 'time', 'title', 'tags', 'created_at', 'updated_at'];
 
-const interactionMentorColumns = ['interaction_id', 'user_username', 'created_at', 'updated_at'];
-const interactionParticipantColumns = ['interaction_id', 'student_id', 'created_at', 'updated_at'];
+const interactionMentorColumns = ['interaction_id', 'user_username', 'created_at'];
+const interactionParticipantColumns = ['interaction_id', 'student_id', 'created_at'];
 
 module.exports = {
   listInteractions: (search, page, perPage, sort, filterByMentorUsername) => {
@@ -70,7 +70,7 @@ module.exports = {
 
   addInteractionMentor: (interactionId, userUsername) => {
     let newInteractionMentor = { interaction_id: interactionId, user_username: userUsername };
-    newInteractionMentor.created_at = newInteractionMentor.updated_at = new Date();
+    newInteractionMentor.created_at = new Date();
     return knex('interaction_mentors').insert(newInteractionMentor)
       .then(insertedIds => Object.assign(newInteractionMentor, { id: insertedIds[0] }));
   },
@@ -90,7 +90,7 @@ module.exports = {
 
   addInteractionParticipant: (interactionId, studentId) => {
     let newInteractionParticipant = { interaction_id: interactionId, student_id: studentId };
-    newInteractionParticipant.created_at = newInteractionParticipant.updated_at = new Date();
+    newInteractionParticipant.created_at = new Date();
     return knex('interaction_participants').insert(newInteractionParticipant)
       .then(insertedIds => Object.assign(newInteractionParticipant, { id: insertedIds[0] }));
   },

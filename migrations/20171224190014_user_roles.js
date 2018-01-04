@@ -1,10 +1,10 @@
 
 exports.up = (knex, Promise) => {
   return Promise.all([
-    knex.schema.createTable('user_roles', table => {      
+    knex.schema.createTable('user_roles', table => {
       table.string('username');
       table.string('role');
-      table.timestamps();
+      table.dateTime('created_at');
       table.primary(['username', 'role']);
     })
   ]);

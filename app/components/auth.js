@@ -17,27 +17,19 @@ const errors = require('http-errors');
 const _ = require('lodash');
 const knex = require('./knex.js');
 const winston = require('./winston.js');
-const { userStatus } = require('../common/constants.js');
 
 const privilegeDelimiter = ':';
 const accessModifiers = { ALL: 'all', OWNER: 'owner' };
 
 const getUserPrivileges = async user => {
   try {
-    let results = await knex('users').distinct('privilege')
-      .leftJoin('user_roles', 'users.username', 'user_roles.username')
+    let results = await knex('user_roles').distinct('privilege')
       .leftJoin('role_privileges', 'user_roles.role', 'role_privileges.role')
       .where('username', user.username);
-    return _.map(results, row => row.privilege);
+    return results.map(row => row.privilege);
   } catch (err) {
     return null;
   }
-};
-
-const predicates = {
-  isActive: (user) => (user && user.status && user.status === userStatus.ACTIVE),
-  isAwaitingValidation: (user) => (user && user.status && user.status === userStatus.AWAITING_VALIDATION),
-  isDisabled: (user) => (user && user.status && user.status === userStatus.DISABLED)
 };
 
 /**
@@ -58,7 +50,7 @@ const requirePrivilege = (operation, checkOwner) => {
     if (!userPrivileges) throw new errors.Unauthorized(`Can't list privileges for user {$req.user.username}.`);
 
     req.accessModifiers = [];
-    const matchingUserPrivileges = _.filter(userPrivileges, p => (p === operation) || (p === operation + privilegeDelimiter));
+    const matchingUserPrivileges = userPrivileges.filter(p => (p === operation) || (p === operation + privilegeDelimiter));
 
     for (const userPrivilege in matchingUserPrivileges) {
       if (userPrivilege === operation) {
@@ -86,9 +78,9 @@ const requirePrivilege = (operation, checkOwner) => {
  * Express middleware that checks whether the user is logged in.
  * Throws a HTTP Unauthorized (401) error otherwise.
  */
-const isLoggedIn = async (req, res, next) => {
+const isLoggedIn = (req, res, next) => {
   if (!req.user) throw new errors.Unauthorized('Not logged in.');
   return next();
 };
 
-module.exports = { accessModifiers, getUserPrivileges, predicates, requirePrivilege, isLoggedIn };
+module.exports = { accessModifiers, getUserPrivileges, requirePrivilege, isLoggedIn };

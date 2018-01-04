@@ -34,7 +34,6 @@ const bodyParser = require('body-parser');
 const methodOverride = require('method-override');
 const session = require('./components/session.js');
 const passport = require('./components/passport.js');
-const auth = require('./components/auth.js');
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());

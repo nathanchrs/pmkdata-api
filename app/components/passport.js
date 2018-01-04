@@ -9,7 +9,7 @@ const LocalStrategy = require('passport-local');
 const knex = require('./knex.js');
 const bcrypt = require('bcryptjs');
 const errors = require('http-errors');
-const auth = require('./auth.js');
+const { userStatus } = require('../common/constants.js');
 
 const userColumns = ['id', 'username', 'nim', 'email', 'password', 'role', 'status', 'created_at', 'updated_at'];
 const userColumnsWithoutPassword = userColumns.filter(column => column !== 'password');
@@ -29,7 +29,7 @@ passport.use(new LocalStrategy(
           delete user.password;
           if (err) return done(err);
           if (!res) return done(new errors.Unauthorized('Wrong username or password.'));
-          if (!auth.predicates.isActive(user)) return done(new errors.Unauthorized('Account inactive.'));
+          if (!user || user.status !== userStatus.ACTIVE) return done(new errors.Unauthorized('Account inactive.'));
           return done(null, user);
         });
       })

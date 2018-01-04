@@ -12,7 +12,7 @@ const router = express.Router();
 /**
  * Check whether the current user is a participating mentor of this interaction.
  */
-async function checkInteractionMentor(req) {
+async function checkInteractionMentor (req) {
   return queries.isInteractionMentor(req.params.id, req.user.username);
 }
 
@@ -92,7 +92,7 @@ router.post('/interactions/:id/mentors', auth.requirePrivilege('create-interacti
 /**
  * Remove a mentor from the given interaction.
  * @name Delete interaction mentor
- * @route {DELETE} /interactions/:id/mentors
+ * @route {DELETE} /interactions/:id/mentors/:userUsername
  */
 router.delete('/interactions/:id/mentors/:userUsername', auth.requirePrivilege('delete-interaction-mentor', checkInteractionMentor), async (req, res) => {
   const affectedRowCount = await queries.removeInteractionMentor(req.params.id, req.params.userUsername);
@@ -106,7 +106,7 @@ router.delete('/interactions/:id/mentors/:userUsername', auth.requirePrivilege('
  */
 router.get('/interactions/:id/participants', auth.requirePrivilege('list-interaction-participants', checkInteractionMentor), async (req, res) => {
   const result = await queries.listInteractionParticipants(req.params.id);
-  return result => res.json(result);
+  return res.json(result);
 });
 
 /**
@@ -122,7 +122,7 @@ router.post('/interactions/:id/participants', auth.requirePrivilege('create-inte
 /**
  * Remove a participant from the given interaction.
  * @name Delete interaction participant
- * @route {DELETE} /interactions/:id/participants
+ * @route {DELETE} /interactions/:id/participants/:studentId
  */
 router.delete('/interactions/:id/participants/:studentId', auth.requirePrivilege('delete-interaction-participant', checkInteractionMentor), async (req, res) => {
   const affectedRowCount = await queries.removeInteractionParticipant(req.params.id, req.params.studentId);

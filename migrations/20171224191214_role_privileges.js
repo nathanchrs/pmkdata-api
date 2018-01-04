@@ -4,7 +4,7 @@ exports.up = (knex, Promise) => {
     knex.schema.createTable('role_privileges', table => {
       table.string('role');
       table.string('privilege');
-      table.timestamps();
+      table.dateTime('created_at');
       table.primary(['role', 'privilege']);
     })
   ]);
