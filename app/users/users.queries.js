@@ -7,7 +7,7 @@ const _ = require('lodash');
 
 const BCRYPT_STRENGTH = 8;
 
-async function checkOldPassword (username, password) {
+async function checkPassword (username, password) {
   const user = await knex.first('username', 'password').from('users').where('username', username);
   if (!user) return false;
 
@@ -19,6 +19,9 @@ const userColumns = ['username', 'nim', 'email', 'password', 'status', 'created_
 const userAssignableColumns = ['username', 'nim', 'email', 'status'];
 const userSearchableColumns = ['username', 'nim', 'email'];
 const userSortableColumns = ['username', 'nim', 'email', 'status', 'created_at', 'updated_at'];
+
+const userRolesColumns = ['username', 'role', 'created_at'];
+const rolePrivilegesColumns = ['role', 'privilege', 'created_at'];
 
 module.exports = {
   listUsers: (search, page, perPage, sort) => {
@@ -87,6 +90,31 @@ module.exports = {
 
   deleteUser: (username) => {
     return knex('users').delete().where('username', username);
+  },
+
+  listUserRoles: (username) => {
+    return knex.select(_.without(userRolesColumns, 'username'))
+      .from('user_roles')
+      .where('username', username);
+  },
+
+  addUserRole: (username, role) => {
+    let newUserRole = { username, role, created_at: new Date() };
+    return knex('user_roles').insert(newUserRole)
+      .then(insertedIds => Object.assign(newUserRole, { id: insertedIds[0] }));
+  },
+
+  removeUserRole: (username, role) => {
+    return knex('user_roles').delete()
+      .where('username', username)
+      .andWhere('role', role);
+  },
+
+  listUserPrivileges: username => {
+    return knex.select(rolePrivilegesColumns.map(column => 'role_privileges.' + column + ' as ' + column))
+      .from('user_roles')
+      .leftJoin('role_privileges', 'user_roles.role', 'role_privileges.role')
+      .where('username', username);
   }
 
 };

@@ -14,7 +14,7 @@ const router = express.Router();
 /**
  * Check whether the current user is accessing itself.
  */
-function checkOwner(req) {
+function checkOwner (req) {
   return req.user.username === req.params.username;
 }
 
@@ -95,10 +95,11 @@ router.patch('/users/:username', auth.requirePrivilege('update-user', checkOwner
  * @route {PATCH} /users/:username/password
  */
 router.patch('/users/:username/password', auth.requirePrivilege('update-user-password', checkOwner), validators.updateUserPassword, async (req, res, next) => {
+  let affectedRowCount;
   if (_.includes(req.accessModifiers, auth.accessModifiers.ALL)) {
-    const affectedRowCount = await queries.updateUserPassword(req.params.username, req.body.newPassword, false);
+    affectedRowCount = await queries.updateUserPassword(req.params.username, req.body.newPassword, false);
   } else {
-    const affectedRowCount = await queries.updateUserPassword(req.params.username, req.body.newPassword, true, req.body.oldPassword);
+    affectedRowCount = await queries.updateUserPassword(req.params.username, req.body.newPassword, true, req.body.oldPassword);
   }
   return res.json({ affectedRowCount });
 });
@@ -109,8 +110,48 @@ router.patch('/users/:username/password', auth.requirePrivilege('update-user-pas
  * @route {DELETE} /users/:username
  */
 router.delete('/users/:username', auth.requirePrivilege('delete-user', checkOwner), async (req, res, next) => {
-  const affectedRowCount = await queries.deleteUser(req.params.username)
+  const affectedRowCount = await queries.deleteUser(req.params.username);
   return res.json({ affectedRowCount });
+});
+
+/**
+ * List the roles of this user.
+ * @name List user roles
+ * @route {GET} /users/:username/roles
+ */
+router.get('/users/:username/roles', auth.requirePrivilege('list-user-roles', checkOwner), async (req, res, next) => {
+  const result = await queries.listUserRoles(req.params.username);
+  return res.json(result);
+});
+
+/**
+ * Add a role for this user
+ * @name Create user role
+ * @route {POST} /users/:username/roles
+ */
+router.post('/users/:username/roles', auth.requirePrivilege('create-user-role', checkOwner), async (req, res, next) => {
+  const insertedUserRole = await queries.addUserRole(req.params.username, req.body.role);
+  return res.status(201).json(insertedUserRole);
+});
+
+/**
+ * Remove a role from this user
+ * @name Remove user role
+ * @route {DELETE} /users/:username/roles/:role
+ */
+router.delete('/users/:username/roles/:role', auth.requirePrivilege('delete-user-role', checkOwner), async (req, res, next) => {
+  const affectedRowCount = await queries.removeUserRole(req.params.username, req.params.role);
+  return res.json({ affectedRowCount });
+});
+
+/**
+ * List the privileges held by this user and the roles from which they are obtained from.
+ * @name List user privileges
+ * @route {GET} /users/:username/privileges
+ */
+router.get('/users/:username/privileges', auth.requirePrivilege('list-user-privileges', checkOwner), async (req, res, next) => {
+  const result = await queries.listUserPrivileges(req.params.username);
+  return res.json(result);
 });
 
 module.exports = router;
