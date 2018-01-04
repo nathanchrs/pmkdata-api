@@ -8,7 +8,7 @@
  * An access modifier can be empty or 'owner'. 'owner' will cause the checkOwner function to be used.
  * An empty access modifier will is equal to the 'all' access modifier.
  * Examples:
- * - 'update-student' or 'update-student:all' can update all students.
+ * - 'update-student' can update all students.
  * - 'update-interaction:owner' can update interactions which are owned by the current user.
  * @module app/components/auth
  */
@@ -50,18 +50,18 @@ const requirePrivilege = (operation, checkOwner) => {
     if (!userPrivileges) throw new errors.Unauthorized(`Can't list privileges for user {$req.user.username}.`);
 
     req.accessModifiers = [];
-    const matchingUserPrivileges = userPrivileges.filter(p => (p === operation) || (p === operation + privilegeDelimiter));
+    const matchingUserPrivileges = userPrivileges.filter(p => (p === operation) || _.startsWith(p, operation + privilegeDelimiter));
 
-    for (const userPrivilege in matchingUserPrivileges) {
-      if (userPrivilege === operation) {
+    for (let i = 0; i < matchingUserPrivileges.length; i++) {
+      if (matchingUserPrivileges[i] === operation) {
         req.accessModifiers.push(accessModifiers.ALL);
-      } else if (userPrivilege === operation + privilegeDelimiter + accessModifiers.OWNER) {
+      } else if (matchingUserPrivileges[i] === operation + privilegeDelimiter + accessModifiers.OWNER) {
         if (_.isFunction(checkOwner)) {
           if (await checkOwner(req)) {
             req.accessModifiers.push(accessModifiers.OWNER);
           }
         } else {
-          winston.log('warn', `Operation ${operation} does not support 'owner' access modifier, or has wrong checkOwner function.`);
+          throw new TypeError(`Operation ${operation} does not support 'owner' access modifier, or has wrong checkOwner function.`);
         }
       }
     }
