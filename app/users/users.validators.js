@@ -44,7 +44,7 @@ const schemas = {
   addUserRole: {
     'type': 'object',
     'properties': {
-      'role': commonSchemas.role
+      'role': commonSchemas.varchar(255)
     },
     'required': ['role']
   }

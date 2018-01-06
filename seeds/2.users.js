@@ -7,7 +7,7 @@ exports.seed = async (knex, Promise) => {
     {
       username: 'admin',
       email: 'admin@pmk.itb.ac.id',
-      password: '$2a$08$QwNk.YBBpry2N09/LVudj.ZvVtkL.6JIYvGd8Y8MT9VQ3mMfHwF8S',
+      password: '$2a$08$gsMdZEtDjF7V3UE2sxj3UuorhAT5nexH0gdu4eVABCQfSjqz5npmO',
       status: 'active'
     } // Password: admin
   ]);
@@ -16,10 +16,6 @@ exports.seed = async (knex, Promise) => {
     {
       username: 'admin',
       role: 'administrator'
-    },
-    {
-      username: 'admin',
-      role: 'user'
     }
   ]);
 };
