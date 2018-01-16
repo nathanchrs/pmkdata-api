@@ -1,11 +1,11 @@
 'use strict';
 
 const knex = require('../components/knex.js');
+const { parseSortQuery, withParams } = require('../common/knexutils.js');
 const _ = require('lodash');
 
 const interactionColumns = ['id', 'time', 'title', 'notes', 'tags', 'created_at', 'updated_at'];
 const interactionAssignableColumns = ['time', 'title', 'notes', 'tags'];
-const interactionSearchableColumns = ['id', 'time', 'title', 'notes', 'tags'];
 const interactionSortableColumns = ['id', 'time', 'title', 'tags', 'created_at', 'updated_at'];
 
 const interactionMentorColumns = ['interaction_id', 'user_username', 'created_at'];
@@ -25,18 +25,18 @@ const interactionFilters = {
 };
 
 module.exports = {
-  listInteractions: (search, page, perPage, sort, filters, filterByMentorUsername) => {
-    let query = knex.select(interactionColumns.map(column => 'interactions.' + column + ' as ' + column)).from('interactions');
-
+  listInteractions: (params, filterByMentorUsername) => {
+    let query = knex.select(interactionColumns.map(column => 'interactions.' + column + ' as ' + column))
+      .from('interactions');
     if (filterByMentorUsername) {
       query = query.leftJoin('interaction_mentors', 'interactions.id', 'interaction_mentors.interaction_id')
         .where('interaction_mentors.user_username', filterByMentorUsername);
     }
-
-    return query
-      .filter(filters, interactionFilters)
-      .search(search, interactionSearchableColumns.map(column => 'interactions.' + column))
-      .pageAndSort(page, perPage, sort, interactionSortableColumns.map(column => 'interactions.' + column));
+    
+    return withParams(knex, query, {
+      filters: interactionFilters,
+      sortableFields: studentSortableColumns
+    }, params);
   },
 
   createInteraction: (newInteraction) => {

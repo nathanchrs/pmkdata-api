@@ -1,6 +1,7 @@
 'use strict';
 
 const knex = require('../components/knex.js');
+const { parseSortQuery, withParams } = require('../common/knexutils.js');
 const errors = require('http-errors');
 const bcrypt = require('bcryptjs');
 const _ = require('lodash');
@@ -17,7 +18,6 @@ async function checkPassword (username, password) {
 
 const userColumns = ['username', 'nim', 'email', 'password', 'status', 'created_at', 'updated_at'];
 const userAssignableColumns = ['username', 'nim', 'email', 'status'];
-const userSearchableColumns = ['username', 'nim', 'email'];
 const userSortableColumns = ['username', 'nim', 'email', 'status', 'created_at', 'updated_at'];
 const userFilters = {
   username: {},
@@ -34,20 +34,22 @@ const userRolesColumns = ['username', 'role', 'created_at'];
 const rolePrivilegesColumns = ['role', 'privilege', 'created_at'];
 
 module.exports = {
-  listUsers: (search, page, perPage, sort, filters) => {
-    return knex.select(userColumns.map(column => 'users.' + column + ' as ' + column).concat(['name']))
+  listUsers: (params) => {
+    const query = knex.select(userColumns.map(column => 'users.' + column + ' as ' + column).concat(['name']))
       .from('users')
-      .leftJoin('students', 'users.nim', 'students.nim')
-      .filter(filters, userFilters)
-      .search(search, userSearchableColumns.map(column => 'users.' + column).concat(['name']))
-      .pageAndSort(page, perPage, sort, userSortableColumns.map(column => 'users.' + column).concat(['name']));
+      .leftJoin('students', 'users.nim', 'students.nim');
+    return withParams(knex, query, {
+      filters: Object.assign(userFilters, { name: {} }),
+      sortableFields: userSortableColumns.concat(['name'])
+    }, params);
   },
 
   searchUsers: (search) => {
     return knex.select(['users.username as username', 'name', 'department', 'year'])
       .from('users')
       .leftJoin('students', 'users.nim', 'students.nim')
-      .search(search, ['name', 'username'])
+      .where('name', 'like', '%' + search + '%')
+      .orWhere('username', 'like', '%' + search + '%')
       .limit(20);
   },
 

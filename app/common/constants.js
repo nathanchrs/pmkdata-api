@@ -11,6 +11,11 @@ const constants = {
     ACTIVE: 'active',
     AWAITING_VALIDATION: 'awaiting_validation',
     DISABLED: 'disabled'
+  },
+
+  sortDirection: {
+    ASCENDING: 'ascending',
+    DESCENDING: 'descending'
   }
 
 };

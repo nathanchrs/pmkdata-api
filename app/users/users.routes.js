@@ -24,8 +24,8 @@ function checkOwner (req) {
  * @route {GET} /users
  */
 router.get('/users', auth.requirePrivilege('list-users'), validators.listUsers, async (req, res, next) => {
-  const { search, page, perPage, sort, ...filters } = req.query;
-  const result = await queries.listUsers(search, page, perPage, sort, filters);
+  const { page, perPage, sort, ...filters } = req.query;
+  const result = await queries.listUsers({ page, perPage, sort, filters });
   return res.json(result);
 });
 

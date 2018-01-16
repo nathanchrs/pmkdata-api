@@ -1,6 +1,7 @@
 'use strict';
 
 const knex = require('../components/knex.js');
+const { parseSortQuery, withParams } = require('../common/knexutils.js');
 const _ = require('lodash');
 
 const studentColumns = [
@@ -13,8 +14,6 @@ const studentAssignableColumns = [
   'tpb_nim', 'nim', 'year', 'department', 'name', 'gender', 'birth_date',
   'phone', 'parent_phone', 'line', 'current_address', 'hometown_address', 'high_school', 'church'
 ];
-
-const studentSearchableColumns = ['id', 'tpb_nim', 'nim', 'department', 'name', 'year', 'phone', 'parent_phone', 'line'];
 
 const studentSortableColumns = [
   'id', 'tpb_nim', 'nim', 'year', 'department', 'name', 'gender', 'birth_date',
@@ -45,18 +44,18 @@ const studentFilters = {
 
 module.exports = {
 
-  listStudents: (search, page, perPage, sort, filters) => {
-    return knex.select(studentColumns)
-      .from('students')
-      .filter(filters, studentFilters)
-      .search(search, studentSearchableColumns)
-      .pageAndSort(page, perPage, sort, studentSortableColumns);
+  listStudents: (params) => {
+    const query = knex.select(studentColumns).from('students');
+    return withParams(knex, query, {
+      filters: studentFilters,
+      sortableFields: studentSortableColumns
+    }, params);
   },
 
   searchStudents: (search) => {
     return knex.select(['id', 'name', 'department', 'year'])
       .from('students')
-      .search(search, ['name'])
+      .where('name', 'like', '%' + search + '%')
       .limit(20);
   },
 
