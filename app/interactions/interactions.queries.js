@@ -11,8 +11,21 @@ const interactionSortableColumns = ['id', 'time', 'title', 'tags', 'created_at',
 const interactionMentorColumns = ['interaction_id', 'user_username', 'created_at'];
 const interactionParticipantColumns = ['interaction_id', 'student_id', 'created_at'];
 
+const interactionFilters = {
+  id: { operator: '=' },
+  timeSince: { field: 'time', operator: '>=' },
+  timeUntil: { field: 'time', operator: '<=' },
+  title: {},
+  notes: {},
+  tags: {},
+  createdSince: { field: 'created_at', operator: '>=' },
+  createdUntil: { field: 'created_at', operator: '<=' },
+  updatedSince: { field: 'updated_at', operator: '>=' },
+  updatedUntil: { field: 'updated_at', operator: '<=' },
+};
+
 module.exports = {
-  listInteractions: (search, page, perPage, sort, filterByMentorUsername) => {
+  listInteractions: (search, page, perPage, sort, filters, filterByMentorUsername) => {
     let query = knex.select(interactionColumns.map(column => 'interactions.' + column + ' as ' + column)).from('interactions');
 
     if (filterByMentorUsername) {
@@ -21,6 +34,7 @@ module.exports = {
     }
 
     return query
+      .filter(filters, interactionFilters)
       .search(search, interactionSearchableColumns.map(column => 'interactions.' + column))
       .pageAndSort(page, perPage, sort, interactionSortableColumns.map(column => 'interactions.' + column));
   },

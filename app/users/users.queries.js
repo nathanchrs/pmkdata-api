@@ -19,15 +19,26 @@ const userColumns = ['username', 'nim', 'email', 'password', 'status', 'created_
 const userAssignableColumns = ['username', 'nim', 'email', 'status'];
 const userSearchableColumns = ['username', 'nim', 'email'];
 const userSortableColumns = ['username', 'nim', 'email', 'status', 'created_at', 'updated_at'];
+const userFilters = {
+  username: {},
+  nim: {},
+  email: {},
+  status: { operator: '=' },
+  createdSince: { field: 'created_at', operator: '>=' },
+  createdUntil: { field: 'created_at', operator: '<=' },
+  updatedSince: { field: 'updated_at', operator: '>=' },
+  updatedUntil: { field: 'updated_at', operator: '<=' },
+};
 
 const userRolesColumns = ['username', 'role', 'created_at'];
 const rolePrivilegesColumns = ['role', 'privilege', 'created_at'];
 
 module.exports = {
-  listUsers: (search, page, perPage, sort) => {
+  listUsers: (search, page, perPage, sort, filters) => {
     return knex.select(userColumns.map(column => 'users.' + column + ' as ' + column).concat(['name']))
       .from('users')
       .leftJoin('students', 'users.nim', 'students.nim')
+      .filter(filters, userFilters)
       .search(search, userSearchableColumns.map(column => 'users.' + column).concat(['name']))
       .pageAndSort(page, perPage, sort, userSortableColumns.map(column => 'users.' + column).concat(['name']));
   },

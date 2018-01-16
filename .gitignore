@@ -9,6 +9,7 @@ docker-compose.production.yml
 
 # Visual Studio Code files
 .vscode
+*.code-*
 
 # jsDoc output
 docs

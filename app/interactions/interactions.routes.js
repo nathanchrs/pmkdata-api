@@ -23,8 +23,9 @@ async function checkInteractionMentor (req) {
  * @route {GET} /interactions
  */
 router.get('/interactions', auth.requirePrivilege('list-interactions', checkInteractionMentor), validators.listInteractions, async (req, res) => {
+  const { search, page, perPage, sort, ...filters } = req.query;
   const filterByMentorUsername = _.includes(req.accessModifiers, auth.accessModifiers.ALL) ? false : req.user.username;
-  const result = await queries.listInteractions(req.query.search, req.query.page, req.query.perPage, req.query.sort, filterByMentorUsername);
+  const result = await queries.listInteractions(search, page, perPage, sort, filters, filterByMentorUsername);
   return res.json(result);
 });
 

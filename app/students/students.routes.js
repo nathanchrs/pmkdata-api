@@ -31,7 +31,8 @@ function checkOwner (req) {
  * @route {GET} /students
  */
 router.get('/students', auth.requirePrivilege('list-students'), validators.listStudents, async (req, res, next) => {
-  const result = await queries.listStudents(req.query.search, req.query.page, req.query.perPage, req.query.sort);
+  const { search, page, perPage, sort, ...filters } = req.query;
+  const result = await queries.listStudents(search, page, perPage, sort, filters);
   return res.json(result);
 });
 

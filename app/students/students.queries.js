@@ -22,11 +22,33 @@ const studentSortableColumns = [
   'created_at', 'updated_at'
 ];
 
+const studentFilters = {
+  id: { operator: '=' },
+  tpb_nim: {},
+  nim: {},
+  department: { operator: '=' },
+  name: {},
+  year: { operator: '=' },
+  gender: { operator: '=' },
+  phone: {},
+  parent_phone: {},
+  line: {},
+  current_address: {},
+  hometown_address: {},
+  high_school: {},
+  church: {},
+  createdSince: { field: 'created_at', operator: '>=' },
+  createdUntil: { field: 'created_at', operator: '<=' },
+  updatedSince: { field: 'updated_at', operator: '>=' },
+  updatedUntil: { field: 'updated_at', operator: '<=' },
+};
+
 module.exports = {
 
-  listStudents: (search, page, perPage, sort) => {
+  listStudents: (search, page, perPage, sort, filters) => {
     return knex.select(studentColumns)
       .from('students')
+      .filter(filters, studentFilters)
       .search(search, studentSearchableColumns)
       .pageAndSort(page, perPage, sort, studentSortableColumns);
   },
