@@ -7,9 +7,9 @@ exports.seed = async (knex, Promise) => {
     {
       username: 'admin',
       email: 'admin@pmk.itb.ac.id',
-      password: '$2a$08$gsMdZEtDjF7V3UE2sxj3UuorhAT5nexH0gdu4eVABCQfSjqz5npmO',
+      password: '$2a$08$Dhq4WyG.tnPaplg6FKiwZebyco8BVEixV9qum3mnCT26PHviqogiS',
       status: 'active'
-    } // Password: admin
+    } // Password: admin123
   ]);
 
   await knex('user_roles').insert([
