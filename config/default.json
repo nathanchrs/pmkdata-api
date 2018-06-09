@@ -28,7 +28,7 @@
       "timestamp": true
     }
   },
-  
+
   "routePrefix": "/api",
 
   "publicUserRegistration": true,

@@ -1,7 +1,7 @@
 'use strict';
 
 const knex = require('../components/knex.js');
-const { parseSortQuery, withParams } = require('../common/knexutils.js');
+const { withParams } = require('../common/knexutils.js');
 const _ = require('lodash');
 
 const interactionColumns = ['id', 'time', 'title', 'notes', 'tags', 'created_at', 'updated_at'];
@@ -21,7 +21,7 @@ const interactionFilters = {
   createdSince: { field: 'created_at', operator: '>=' },
   createdUntil: { field: 'created_at', operator: '<=' },
   updatedSince: { field: 'updated_at', operator: '>=' },
-  updatedUntil: { field: 'updated_at', operator: '<=' },
+  updatedUntil: { field: 'updated_at', operator: '<=' }
 };
 
 module.exports = {
@@ -32,10 +32,10 @@ module.exports = {
       query = query.leftJoin('interaction_mentors', 'interactions.id', 'interaction_mentors.interaction_id')
         .where('interaction_mentors.user_username', filterByMentorUsername);
     }
-    
+
     return withParams(knex, query, {
       filters: interactionFilters,
-      sortableFields: studentSortableColumns
+      sortableFields: interactionSortableColumns
     }, params);
   },
 

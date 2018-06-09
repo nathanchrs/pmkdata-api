@@ -1,7 +1,7 @@
 'use strict';
 
 const knex = require('../components/knex.js');
-const { parseSortQuery, withParams } = require('../common/knexutils.js');
+const { withParams } = require('../common/knexutils.js');
 const _ = require('lodash');
 
 const studentColumns = [
@@ -39,7 +39,7 @@ const studentFilters = {
   createdSince: { field: 'created_at', operator: '>=' },
   createdUntil: { field: 'created_at', operator: '<=' },
   updatedSince: { field: 'updated_at', operator: '>=' },
-  updatedUntil: { field: 'updated_at', operator: '<=' },
+  updatedUntil: { field: 'updated_at', operator: '<=' }
 };
 
 module.exports = {
