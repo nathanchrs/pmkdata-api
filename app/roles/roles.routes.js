@@ -1,9 +1,9 @@
 'use strict';
 
 const express = require('express');
-const auth = require('../components/auth.js');
-const validators = require('./roles.validators.js');
-const queries = require('./roles.queries.js');
+const auth = require('../common/auth');
+const validators = require('./roles.validators');
+const queries = require('./roles.queries');
 
 const router = express.Router();
 

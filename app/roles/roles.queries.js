@@ -1,6 +1,6 @@
 'use strict';
 
-const knex = require('../components/knex.js');
+const knex = require('../common/knex');
 const _ = require('lodash');
 
 const rolePrivilegesColumns = ['role', 'privilege', 'created_at'];

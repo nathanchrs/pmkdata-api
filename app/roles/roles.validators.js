@@ -1,8 +1,8 @@
 'use strict';
 
 const _ = require('lodash');
-const validation = require('../components/validation.js');
-const commonSchemas = require('../common/schemas.js');
+const validation = require('../common/validation');
+const commonSchemas = require('../common/schemas');
 
 const schemas = {
   createRolePrivilege: {

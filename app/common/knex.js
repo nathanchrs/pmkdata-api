@@ -6,7 +6,7 @@
  * until Knex provides a proper way to extend QueryBuilder.
  * See [this issue](https://github.com/tgriesser/knex/issues/1158)
  * (the workaround recommended there does not work starting from 0.12.0).
- * @module app/components/knex
+ * @module app/common/knex
  */
 
 const Knex = require('knex');

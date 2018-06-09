@@ -1,7 +1,7 @@
 'use strict';
 
 const express = require('express');
-const auth = require('../components/auth.js');
+const auth = require('../common/auth');
 const errors = require('http-errors');
 const queries = require('./students.queries');
 const validators = require('./students.validators');

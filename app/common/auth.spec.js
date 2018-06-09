@@ -7,8 +7,8 @@ chai.use(sinonChai);
 const sinon = require('sinon');
 const expect = chai.expect;
 const errors = require('http-errors');
-const knex = require('./knex.js');
-const auth = require('./auth.js');
+const knex = require('./knex');
+const auth = require('./auth');
 
 const testRolePrivileges = [
   { role: 'test-role-1', privilege: 'public-operation-name' },

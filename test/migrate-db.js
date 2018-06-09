@@ -1,7 +1,7 @@
 'use strict';
 
 const knexCleaner = require('knex-cleaner');
-const knex = require('../app/components/knex.js');
+const knex = require('../app/common/knex');
 
 before(async () => {
   console.log('Cleaning test DB before starting tests...');

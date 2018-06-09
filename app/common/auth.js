@@ -10,13 +10,13 @@
  * Examples:
  * - 'update-student' can update all students.
  * - 'update-interaction:owner' can update interactions which are owned by the current user.
- * @module app/components/auth
+ * @module app/common/auth
  */
 
 const errors = require('http-errors');
 const _ = require('lodash');
-const knex = require('./knex.js');
-const winston = require('./winston.js');
+const knex = require('./knex');
+const winston = require('./winston');
 
 const privilegeDelimiter = ':';
 const accessModifiers = { ALL: 'all', OWNER: 'owner' };

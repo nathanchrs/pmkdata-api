@@ -2,7 +2,7 @@
 
 const express = require('express');
 const _ = require('lodash');
-const auth = require('../components/auth.js');
+const auth = require('../common/auth');
 const errors = require('http-errors');
 const queries = require('./interactions.queries');
 const validators = require('./interactions.validators');

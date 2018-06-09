@@ -1,15 +1,15 @@
 'use strict';
 
 /**
- * @module app/components/passport
+ * @module app/common/passport
  */
 
 const passport = require('passport');
 const LocalStrategy = require('passport-local');
-const knex = require('./knex.js');
+const knex = require('./knex');
 const bcrypt = require('bcryptjs');
 const errors = require('http-errors');
-const { userStatus } = require('../common/constants.js');
+const { userStatus } = require('../common/constants');
 
 const userColumns = ['username', 'nim', 'email', 'password', 'status', 'created_at', 'updated_at'];
 const userColumnsWithoutPassword = userColumns.filter(column => column !== 'password');

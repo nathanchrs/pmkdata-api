@@ -2,7 +2,7 @@
 
 const chai = require('chai');
 const expect = chai.expect;
-const { parseSortQuery } = require('./knexutils.js');
+const { parseSortQuery } = require('./knexutils');
 
 describe('Knex utilities', function () {
   describe('parseSortQuery', function () {

@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * @module app/components/winston
+ * @module app/common/winston
  */
 
 var winston = require('winston');

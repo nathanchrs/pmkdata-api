@@ -24,7 +24,7 @@ global.appDirectory = __dirname;
 
 /* Create the logger */
 
-const winston = require('./components/winston.js');
+const winston = require('./common/winston');
 
 /* Set up Express middleware */
 
@@ -32,8 +32,8 @@ winston.log('verbose', 'Setting up Express middleware...');
 
 const bodyParser = require('body-parser');
 const methodOverride = require('method-override');
-const session = require('./components/session.js');
-const passport = require('./components/passport.js');
+const session = require('./common/session');
+const passport = require('./common/passport');
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());

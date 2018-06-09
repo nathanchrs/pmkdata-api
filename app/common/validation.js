@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * @module app/components/validation
+ * @module app/common/validation
  */
 
 const Ajv = require('ajv');

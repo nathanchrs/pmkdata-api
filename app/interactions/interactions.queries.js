@@ -1,7 +1,7 @@
 'use strict';
 
-const knex = require('../components/knex.js');
-const { withParams } = require('../common/knexutils.js');
+const knex = require('../common/knex');
+const { withParams } = require('../common/knexutils');
 const _ = require('lodash');
 
 const interactionColumns = ['id', 'time', 'title', 'notes', 'tags', 'created_at', 'updated_at'];

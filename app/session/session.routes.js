@@ -5,9 +5,9 @@
  */
 
 const express = require('express');
-const passport = require('../components/passport.js');
-const auth = require('../components/auth.js');
-const validators = require('./session.validators.js');
+const passport = require('../common/passport');
+const auth = require('../common/auth');
+const validators = require('./session.validators');
 
 const router = express.Router();
 

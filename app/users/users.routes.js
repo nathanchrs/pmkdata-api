@@ -2,12 +2,12 @@
 
 const express = require('express');
 const _ = require('lodash');
-const auth = require('../components/auth.js');
-const validators = require('./users.validators.js');
+const auth = require('../common/auth');
+const validators = require('./users.validators');
 const errors = require('http-errors');
-const queries = require('./users.queries.js');
+const queries = require('./users.queries');
 const config = require('config');
-const { userStatus } = require('../common/constants.js');
+const { userStatus } = require('../common/constants');
 
 const router = express.Router();
 

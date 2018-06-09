@@ -9,8 +9,8 @@
 const config = require('config');
 const http = require('http');
 
-/** The application to serve. Read from `app/app.js`. */
-const app = require('./app/app.js');
+/** The application to serve. Read from `app/index.js`. */
+const app = require('./app/index');
 
 /** The port to use for the application. Obtained from configuration, normalized, then stored in the app object. */
 const port = normalizePort(config.get('port'));

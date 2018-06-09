@@ -1,13 +1,13 @@
 'use strict';
 
 /**
- * @module app/components/session
+ * @module app/common/session
  */
 
 const session = require('express-session');
 const RedisStore = require('connect-redis')(session);
 const config = require('config');
-const redisClient = require('./redis.js');
+const redisClient = require('./redis');
 const sessionStore = new RedisStore({ client: redisClient, prefix: 'pmkdata:session:' });
 
 /**

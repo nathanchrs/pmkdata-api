@@ -1,7 +1,7 @@
 'use strict';
 
-const knex = require('../components/knex.js');
-const { withParams } = require('../common/knexutils.js');
+const knex = require('../common/knex');
+const { withParams } = require('../common/knexutils');
 const errors = require('http-errors');
 const bcrypt = require('bcryptjs');
 const _ = require('lodash');

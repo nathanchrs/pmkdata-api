@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * @module app/components/redis
+ * @module app/common/redis
  */
 
 const redis = require('redis');
