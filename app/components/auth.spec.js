@@ -7,25 +7,31 @@ chai.use(sinonChai);
 const sinon = require('sinon');
 const expect = chai.expect;
 const errors = require('http-errors');
-const knexCleaner = require('knex-cleaner');
 const knex = require('./knex.js');
 const auth = require('./auth.js');
 
+const testRolePrivileges = [
+  { role: 'test-role-1', privilege: 'public-operation-name' },
+  { role: 'test-role-2', privilege: 'public-operation-2-name' },
+  { role: 'test-role-3', privilege: 'owner-operation-name:owner' },
+  { role: 'test-role-4', privilege: 'public-owner-operation-name' },
+  { role: 'test-role-4', privilege: 'public-owner-operation-name:owner' }
+];
+
+const testUserRoles = [
+  { username: 'test-user-a', role: 'test-role-1' },
+  { username: 'test-user-a', role: 'test-role-2' },
+  { username: 'test-user-b', role: 'test-role-3' },
+  { username: 'test-user-c', role: 'test-role-4' }
+];
+
 describe('Auth', function () {
   before(async () => {
-    await knexCleaner.clean(knex);
-    await knex.migrate.latest();
+    await knex('role_privileges').del();
+    await knex('role_privileges').insert(testRolePrivileges);
 
-    await knex('role_privileges').insert({ role: 'test-role-1', privilege: 'public-operation-name' });
-    await knex('role_privileges').insert({ role: 'test-role-2', privilege: 'public-operation-2-name' });
-    await knex('role_privileges').insert({ role: 'test-role-3', privilege: 'owner-operation-name:owner' });
-    await knex('role_privileges').insert({ role: 'test-role-4', privilege: 'public-owner-operation-name' });
-    await knex('role_privileges').insert({ role: 'test-role-4', privilege: 'public-owner-operation-name:owner' });
-
-    await knex('user_roles').insert({ username: 'test-user-a', role: 'test-role-1' });
-    await knex('user_roles').insert({ username: 'test-user-a', role: 'test-role-2' });
-    await knex('user_roles').insert({ username: 'test-user-b', role: 'test-role-3' });
-    await knex('user_roles').insert({ username: 'test-user-c', role: 'test-role-4' });
+    await knex('user_roles').del();
+    await knex('user_roles').insert(testUserRoles);
   });
 
   describe('requirePrivilege middleware', function () {

@@ -1,0 +1,2 @@
+--recursive
+./test/migrate-db.js
